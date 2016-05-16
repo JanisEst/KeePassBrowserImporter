@@ -295,15 +295,14 @@ namespace KeePassBrowserImporter
 					break;
 				}
 
+				var url = staturl.pwcsUrl;
 				var qi = staturl.pwcsUrl.IndexOf('?');
 				if (qi != -1)
 				{
-					history.Add(staturl.pwcsUrl.Substring(0, qi));
+					url = url.Substring(0, qi);
 				}
-				else
-				{
-					history.Add(staturl.pwcsUrl);
-				}
+
+				history.Add((url + '\0').ToLower());
 			}
 
 			var typedUrls = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Internet Explorer\TypedURLs");
@@ -314,7 +313,7 @@ namespace KeePassBrowserImporter
 					var url = typedUrls.GetValue(name, string.Empty) as string;
 					if (url != null)
 					{
-						history.Add(url);
+						history.Add((url + '\0').ToLower());
 					}
 				}
 			}
@@ -332,7 +331,7 @@ namespace KeePassBrowserImporter
 			{
 				foreach (var url in GetHistoryItems())
 				{
-					var hash = sha1.ComputeHash(Encoding.Unicode.GetBytes((url + '\0').ToLower()));
+					var hash = sha1.ComputeHash(Encoding.Unicode.GetBytes(url));
 
 					var sb = new StringBuilder();
 
