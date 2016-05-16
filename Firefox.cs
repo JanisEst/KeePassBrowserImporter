@@ -90,7 +90,11 @@ namespace KeePassBrowserImporter
 
 		public class NetworkSecurityServicesException : Exception
 		{
+			public NetworkSecurityServicesException(string message)
+				: base(message)
+			{
 
+			}
 		}
 
 		private string profileDirectory;
@@ -151,22 +155,22 @@ namespace KeePassBrowserImporter
 			{
 				if (NSS_Init(currentProfilePath) != SECStatus.Success)
 				{
-					throw new NetworkSecurityServicesException();
+					throw new NetworkSecurityServicesException("NSS_Init failed: Wrong profile path?\n\n" + currentProfilePath);
 				}
 
 				if ((slot = PK11_GetInternalKeySlot()) == IntPtr.Zero)
 				{
-					throw new NetworkSecurityServicesException();
+					throw new NetworkSecurityServicesException("PK11_GetInternalKeySlot failed");
 				}
 
 				if (PK11_CheckUserPassword(slot, param.Password) != SECStatus.Success)
 				{
-					throw new NetworkSecurityServicesException();
+					throw new NetworkSecurityServicesException("PK11_CheckUserPassword failed: Wrong Master Password?");
 				}
 
 				if (PK11_Authenticate(slot, false, IntPtr.Zero) != SECStatus.Success)
 				{
-					throw new NetworkSecurityServicesException();
+					throw new NetworkSecurityServicesException("PK11_Authenticate failed");
 				}
 
 				foreach (var item in ReadLoginsFile(currentProfilePath).Union(ReadSignonsFile(currentProfilePath)))
