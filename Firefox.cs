@@ -294,7 +294,9 @@ namespace KeePassBrowserImporter
 
 				try
 				{
-					result = Marshal.PtrToStringAnsi(reply.Data, reply.Length);
+					byte[] tmp = new byte[reply.Length];
+					Marshal.Copy(reply.Data, tmp, 0, reply.Length);
+					result = System.Text.Encoding.UTF8.GetString(tmp);
 				}
 				finally
 				{
