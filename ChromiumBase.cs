@@ -21,6 +21,13 @@ namespace KeePassBrowserImporter
 			this.path = path;
 		}
 
+		public override bool SupportsProfiles { get { return true; } }
+
+		public override string GetProfilePath(string profile)
+		{
+			return Path.Combine(ProfilePath, profile);
+		}
+
 		public override bool IsAvailable { get { return Directory.Exists(path); } }
 
 		public override bool UsesMasterPassword { get { return false; } }
@@ -32,7 +39,11 @@ namespace KeePassBrowserImporter
 		/// <param name="param">The parameters for the import</param>
 		public override void ImportCredentials(ImportParameter param)
 		{
-			var currentProfilePath = !string.IsNullOrEmpty(param.Profile) ? Path.Combine(ProfilePath, param.Profile) : ProfilePath;
+			var currentProfilePath = !string.IsNullOrEmpty(param.CustomProfilePath)
+				? param.CustomProfilePath
+				: !string.IsNullOrEmpty(param.Profile)
+					? Path.Combine(ProfilePath, param.Profile)
+					: ProfilePath;
 			if (!Directory.Exists(currentProfilePath))
 			{
 				throw new FileNotFoundException(currentProfilePath);

@@ -1,4 +1,5 @@
 ﻿using KeePassLib;
+using KeePassLib.Utility;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -67,6 +68,14 @@ namespace KeePassBrowserImporter
 			}
 		}
 
+		public string CustomProfilePath
+		{
+			get
+			{
+				return customProfilePath;
+			}
+		}
+
 		public string MasterPassword
 		{
 			get
@@ -91,11 +100,15 @@ namespace KeePassBrowserImporter
 			}
 		}
 
+		private string customProfilePath;
+
 		public ProviderForm(PwDatabase database)
 		{
 			Contract.Requires(database != null);
 
 			InitializeComponent();
+
+			Icon = Properties.Resources.B16x16_Combined.ToIcon();
 
 			var providers = new List<IBrowserImporter>
 			{
@@ -165,10 +178,14 @@ namespace KeePassBrowserImporter
 				return;
 			}
 
+			SetProfilePath(null);
+
 			var provider = (IBrowserImporter)radio.Tag;
 
-			profileGroupBox.Enabled = provider.SupportsMultipleProfiles;
 			profileComboBox.Items.Clear();
+
+			profileGroupBox.Enabled = provider.SupportsProfiles;
+			profileComboBox.Enabled = provider.SupportsMultipleProfiles;
 			if (provider.SupportsMultipleProfiles)
 			{
 				var profiles = provider.GetProfiles().ToArray();
@@ -182,14 +199,34 @@ namespace KeePassBrowserImporter
 			masterPasswordGroupBox.Enabled = provider.UsesMasterPassword;
 		}
 
-		private void startButton_Click(object sender, EventArgs e)
+		private void searchProfileButton_Click(object sender, EventArgs e)
 		{
-			DialogResult = DialogResult.OK;
+			using (var fbd = new FolderBrowserDialog())
+			{
+				if (fbd.ShowDialog() == DialogResult.OK)
+				{
+					customProfilePath = fbd.SelectedPath;
+
+					SetProfilePath(customProfilePath);
+				}
+			}
 		}
 
-		private void closeButton_Click(object sender, EventArgs e)
+		private void profileComboBox_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			DialogResult = DialogResult.Cancel;
+			SetProfilePath(SelectedProvider?.GetProfilePath(profileComboBox.SelectedItem as string));
+		}
+
+		private void SetProfilePath(string path)
+		{
+			if (string.IsNullOrEmpty(path))
+			{
+				profilePathLabel.Text = string.Empty;
+			}
+			else
+			{
+				profilePathLabel.Text = StrUtil.CompactString3Dots(path, 65);
+			}
 		}
 	}
 }

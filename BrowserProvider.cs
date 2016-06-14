@@ -41,6 +41,8 @@ namespace KeePassBrowserImporter
 					Group = pf.SelectedGroup ?? pwStorage.RootGroup,
 
 					Profile = pf.SelectedProfile,
+					CustomProfilePath = pf.CustomProfilePath,
+
 					Password = pf.MasterPassword,
 
 					ExtractTitle = pf.ExtractTitle,

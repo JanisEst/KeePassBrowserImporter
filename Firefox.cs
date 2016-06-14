@@ -115,12 +115,19 @@ namespace KeePassBrowserImporter
 			}
 		}
 
+		public override bool SupportsProfiles { get { return true; } }
+
 		public override bool SupportsMultipleProfiles { get { return true; } }
 
 		/// <summary>Gets all subdirectories in the profiles directory.</summary>
 		public override IEnumerable<string> GetProfiles()
 		{
 			return Directory.EnumerateDirectories(profileDirectory).Select(s => Path.GetFileName(s));
+		}
+
+		public override string GetProfilePath(string profile)
+		{
+			return Path.Combine(profileDirectory, profile);
 		}
 
 		public override bool UsesMasterPassword { get { return true; } }
@@ -133,7 +140,9 @@ namespace KeePassBrowserImporter
 		/// <param name="param">The parameters for the import</param>
 		public override void ImportCredentials(ImportParameter param)
 		{
-			var currentProfilePath = Path.Combine(profileDirectory, param.Profile);
+			var currentProfilePath = !string.IsNullOrEmpty(param.CustomProfilePath)
+				? param.CustomProfilePath
+				: Path.Combine(profileDirectory, param.Profile);
 			if (!Directory.Exists(currentProfilePath))
 			{
 				throw new FileNotFoundException(currentProfilePath);

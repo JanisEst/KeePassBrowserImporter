@@ -41,6 +41,7 @@
 			this.firefoxIconBox = new System.Windows.Forms.PictureBox();
 			this.firefoxRadioButton = new System.Windows.Forms.RadioButton();
 			this.profileGroupBox = new System.Windows.Forms.GroupBox();
+			this.searchProfileButton = new System.Windows.Forms.Button();
 			this.label2 = new System.Windows.Forms.Label();
 			this.profileComboBox = new System.Windows.Forms.ComboBox();
 			this.masterPasswordGroupBox = new System.Windows.Forms.GroupBox();
@@ -55,6 +56,8 @@
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.groupComboBox = new System.Windows.Forms.ComboBox();
 			this.label5 = new System.Windows.Forms.Label();
+			this.label6 = new System.Windows.Forms.Label();
+			this.profilePathLabel = new System.Windows.Forms.Label();
 			this.groupBox1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.chromiumIconBox)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.operaIconBox)).BeginInit();
@@ -203,14 +206,27 @@
 			// 
 			// profileGroupBox
 			// 
+			this.profileGroupBox.Controls.Add(this.profilePathLabel);
+			this.profileGroupBox.Controls.Add(this.label6);
+			this.profileGroupBox.Controls.Add(this.searchProfileButton);
 			this.profileGroupBox.Controls.Add(this.label2);
 			this.profileGroupBox.Controls.Add(this.profileComboBox);
 			this.profileGroupBox.Location = new System.Drawing.Point(12, 171);
 			this.profileGroupBox.Name = "profileGroupBox";
-			this.profileGroupBox.Size = new System.Drawing.Size(366, 66);
+			this.profileGroupBox.Size = new System.Drawing.Size(366, 97);
 			this.profileGroupBox.TabIndex = 1;
 			this.profileGroupBox.TabStop = false;
 			this.profileGroupBox.Text = "Profile";
+			// 
+			// searchProfileButton
+			// 
+			this.searchProfileButton.Location = new System.Drawing.Point(294, 36);
+			this.searchProfileButton.Name = "searchProfileButton";
+			this.searchProfileButton.Size = new System.Drawing.Size(32, 21);
+			this.searchProfileButton.TabIndex = 2;
+			this.searchProfileButton.Text = "...";
+			this.searchProfileButton.UseVisualStyleBackColor = true;
+			this.searchProfileButton.Click += new System.EventHandler(this.searchProfileButton_Click);
 			// 
 			// label2
 			// 
@@ -229,12 +245,13 @@
 			this.profileComboBox.Name = "profileComboBox";
 			this.profileComboBox.Size = new System.Drawing.Size(279, 21);
 			this.profileComboBox.TabIndex = 0;
+			this.profileComboBox.SelectedIndexChanged += new System.EventHandler(this.profileComboBox_SelectedIndexChanged);
 			// 
 			// masterPasswordGroupBox
 			// 
 			this.masterPasswordGroupBox.Controls.Add(this.masterPasswordTextBox);
 			this.masterPasswordGroupBox.Controls.Add(this.label3);
-			this.masterPasswordGroupBox.Location = new System.Drawing.Point(12, 244);
+			this.masterPasswordGroupBox.Location = new System.Drawing.Point(12, 275);
 			this.masterPasswordGroupBox.Name = "masterPasswordGroupBox";
 			this.masterPasswordGroupBox.Size = new System.Drawing.Size(366, 66);
 			this.masterPasswordGroupBox.TabIndex = 2;
@@ -262,7 +279,7 @@
 			this.groupBox2.Controls.Add(this.extractIconCheckBox);
 			this.groupBox2.Controls.Add(this.extractTitleCheckBox);
 			this.groupBox2.Controls.Add(this.label4);
-			this.groupBox2.Location = new System.Drawing.Point(12, 390);
+			this.groupBox2.Location = new System.Drawing.Point(12, 421);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(366, 94);
 			this.groupBox2.TabIndex = 3;
@@ -305,31 +322,31 @@
 			// 
 			// closeButton
 			// 
-			this.closeButton.Location = new System.Drawing.Point(303, 490);
+			this.closeButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+			this.closeButton.Location = new System.Drawing.Point(303, 521);
 			this.closeButton.Name = "closeButton";
 			this.closeButton.Size = new System.Drawing.Size(75, 23);
 			this.closeButton.TabIndex = 5;
 			this.closeButton.Text = "Close";
 			this.closeButton.UseVisualStyleBackColor = true;
-			this.closeButton.Click += new System.EventHandler(this.closeButton_Click);
 			// 
 			// startButton
 			// 
+			this.startButton.DialogResult = System.Windows.Forms.DialogResult.OK;
 			this.startButton.Image = global::KeePassBrowserImporter.Properties.Resources.B16x16_Apply;
 			this.startButton.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.startButton.Location = new System.Drawing.Point(201, 490);
+			this.startButton.Location = new System.Drawing.Point(201, 521);
 			this.startButton.Name = "startButton";
 			this.startButton.Size = new System.Drawing.Size(96, 23);
 			this.startButton.TabIndex = 4;
 			this.startButton.Text = "Start";
 			this.startButton.UseVisualStyleBackColor = true;
-			this.startButton.Click += new System.EventHandler(this.startButton_Click);
 			// 
 			// groupBox3
 			// 
 			this.groupBox3.Controls.Add(this.groupComboBox);
 			this.groupBox3.Controls.Add(this.label5);
-			this.groupBox3.Location = new System.Drawing.Point(12, 317);
+			this.groupBox3.Location = new System.Drawing.Point(12, 348);
 			this.groupBox3.Name = "groupBox3";
 			this.groupBox3.Size = new System.Drawing.Size(366, 66);
 			this.groupBox3.TabIndex = 6;
@@ -354,11 +371,30 @@
 			this.label5.TabIndex = 0;
 			this.label5.Text = "Select the group in which the entries should get imported.";
 			// 
+			// label6
+			// 
+			this.label6.AutoSize = true;
+			this.label6.Location = new System.Drawing.Point(9, 62);
+			this.label6.Name = "label6";
+			this.label6.Size = new System.Drawing.Size(64, 13);
+			this.label6.TabIndex = 3;
+			this.label6.Text = "Profile-Path:";
+			// 
+			// profilePathLabel
+			// 
+			this.profilePathLabel.Location = new System.Drawing.Point(9, 76);
+			this.profilePathLabel.Name = "profilePathLabel";
+			this.profilePathLabel.Size = new System.Drawing.Size(348, 13);
+			this.profilePathLabel.TabIndex = 4;
+			this.profilePathLabel.Text = "<>";
+			// 
 			// ProviderForm
 			// 
+			this.AcceptButton = this.startButton;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(389, 522);
+			this.CancelButton = this.closeButton;
+			this.ClientSize = new System.Drawing.Size(389, 553);
 			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.closeButton);
 			this.Controls.Add(this.startButton);
@@ -366,12 +402,12 @@
 			this.Controls.Add(this.masterPasswordGroupBox);
 			this.Controls.Add(this.profileGroupBox);
 			this.Controls.Add(this.groupBox1);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.MaximizeBox = false;
 			this.Name = "ProviderForm";
-			this.ShowIcon = false;
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-			this.Text = "KeePassBrowserImport";
+			this.Text = "KeePassBrowserImporter";
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.chromiumIconBox)).EndInit();
@@ -420,5 +456,8 @@
 		private System.Windows.Forms.GroupBox groupBox3;
 		private System.Windows.Forms.ComboBox groupComboBox;
 		private System.Windows.Forms.Label label5;
+		private System.Windows.Forms.Button searchProfileButton;
+		private System.Windows.Forms.Label profilePathLabel;
+		private System.Windows.Forms.Label label6;
 	}
 }

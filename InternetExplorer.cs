@@ -247,11 +247,18 @@ namespace KeePassBrowserImporter
 
 		public override bool IsAvailable { get { return Environment.OSVersion.Platform == PlatformID.Win32NT; } }
 
+		public override bool SupportsProfiles { get { return false; } }
+
 		public override bool SupportsMultipleProfiles { get { return false; } }
 
 		public override IEnumerable<string> GetProfiles()
 		{
-			return Enumerable.Empty<string>();
+			throw new NotImplementedException();
+		}
+
+		public override string GetProfilePath(string profile)
+		{
+			return "not available";
 		}
 
 		public override bool UsesMasterPassword { get { return false; } }

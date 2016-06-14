@@ -12,6 +12,8 @@ namespace KeePassBrowserImporter
 		public PwGroup Group;
 
 		public string Profile;
+		public string CustomProfilePath;
+
 		public string Password;
 		public bool ExtractTitle;
 		public bool ExtractIcon;
@@ -22,11 +24,17 @@ namespace KeePassBrowserImporter
 		/// <summary>Checks if the importer is available.</summary>
 		public abstract bool IsAvailable { get; }
 
+		/// <summary>Checks if the importer supports profiles.</summary>
+		public abstract bool SupportsProfiles { get; }
+
 		/// <summary>Checks if the importer supports multiple profiles.</summary>
 		public abstract bool SupportsMultipleProfiles { get; }
 
 		/// <summary>Gets all availables profiles.</summary>
 		public abstract IEnumerable<string> GetProfiles();
+
+		/// <summary>Gets the path of the given profile.</summary>
+		public abstract string GetProfilePath(string profile);
 
 		/// <summary>Checks if the importer uses a master password.</summary>
 		public abstract bool UsesMasterPassword { get; }
