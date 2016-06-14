@@ -1,6 +1,5 @@
 ﻿using KeePass.DataExchange;
 using KeePassLib.Utility;
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Data;

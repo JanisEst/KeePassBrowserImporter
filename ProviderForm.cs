@@ -214,7 +214,11 @@ namespace KeePassBrowserImporter
 
 		private void profileComboBox_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			SetProfilePath(SelectedProvider?.GetProfilePath(profileComboBox.SelectedItem as string));
+			var provider = SelectedProvider;
+			if (provider != null)
+			{
+				SetProfilePath(provider.GetProfilePath(profileComboBox.SelectedItem as string));
+			}
 		}
 
 		private void SetProfilePath(string path)
