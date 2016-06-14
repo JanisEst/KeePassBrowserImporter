@@ -389,7 +389,7 @@ namespace KeePassBrowserImporter
 
 										offset += Marshal.SizeOf(typeof(SecretEntry));
 
-										yield return Tuple.Create(url.Trim(), username, password);
+										yield return Tuple.Create(url.Trim('\0').Trim(), username, password);
 									}
 								}
 							}
