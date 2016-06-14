@@ -103,19 +103,25 @@ namespace KeePassBrowserImporter
 
 										var data = ms.ToArray();
 
+										var createNewIcon = true;
 										foreach (var item in pd.CustomIcons)
 										{
 											if (KeePassLib.Utility.MemUtil.ArraysEqual(data, item.ImageDataPng))
 											{
 												pe.CustomIconUuid = item.Uuid;
 
-												return;
+												createNewIcon = false;
+
+												break;
 											}
 										}
 
-										var pwci = new PwCustomIcon(new PwUuid(true), data);
-										pd.CustomIcons.Add(pwci);
-										pe.CustomIconUuid = pwci.Uuid;
+										if (createNewIcon)
+										{
+											var pwci = new PwCustomIcon(new PwUuid(true), data);
+											pd.CustomIcons.Add(pwci);
+											pe.CustomIconUuid = pwci.Uuid;
+										}
 									}
 								}
 
