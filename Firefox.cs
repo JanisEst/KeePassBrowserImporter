@@ -2,6 +2,7 @@
 using KeePassLib.Utility;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace KeePassBrowserImporter
 		[DllImport(KERNEL32_DLL)]
 		private static extern bool SetDllDirectory(string lpPathName);
 
-		[DllImport(KERNEL32_DLL)]
+		[DllImport(KERNEL32_DLL, SetLastError = true)]
 		private static extern IntPtr LoadLibrary(string fileName);
 
 		[DllImport(KERNEL32_DLL)]
@@ -104,15 +105,7 @@ namespace KeePassBrowserImporter
 			profileDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"Mozilla\Firefox\Profiles");
 		}
 
-		/// <summary>Checks if the profile directory exist and contains subdirectories.</summary>
-		public override bool IsAvailable
-		{
-			get
-			{
-				return Directory.Exists(profileDirectory)
-					&& Directory.EnumerateDirectories(profileDirectory).Any();
-			}
-		}
+		public override bool IsAvailable { get { return true; } } //Firefox Portable could be available
 
 		public override bool SupportsProfiles { get { return true; } }
 
@@ -144,7 +137,7 @@ namespace KeePassBrowserImporter
 				: Path.Combine(profileDirectory, param.Profile);
 			if (!Directory.Exists(currentProfilePath))
 			{
-				throw new FileNotFoundException(currentProfilePath);
+				throw new ProfileNotFoundException(currentProfilePath);
 			}
 
 			var pluginPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -155,7 +148,7 @@ namespace KeePassBrowserImporter
 			var nss3Handle = LoadLibrary(Path.Combine(nativeLibraryPath, NSS3_DLL));
 			if (nss3Handle == IntPtr.Zero)
 			{
-				throw new Exception();
+				throw new Win32Exception();
 			}
 
 			IntPtr slot = IntPtr.Zero;

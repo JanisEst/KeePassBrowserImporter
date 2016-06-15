@@ -46,13 +46,13 @@ namespace KeePassBrowserImporter
 					: ProfilePath;
 			if (!Directory.Exists(currentProfilePath))
 			{
-				throw new FileNotFoundException(currentProfilePath);
+				throw new ProfileNotFoundException(currentProfilePath);
 			}
 
 			var loginDataPath = Path.Combine(currentProfilePath, "Login Data");
 			if (!File.Exists(loginDataPath))
 			{
-				throw new FileNotFoundException(loginDataPath);
+				throw new ProfileNotFoundException(loginDataPath);
 			}
 
 			using (var db = new DBHandler(loginDataPath))

@@ -17,11 +17,15 @@ namespace KeePassBrowserImporter
 		/// <summary>Gets the folders which contain the "Login Data" file.</summary>
 		public override IEnumerable<string> GetProfiles()
 		{
-			foreach (var dir in new DirectoryInfo(ProfilePath).EnumerateDirectories())
+			var profileDir = new DirectoryInfo(ProfilePath);
+			if (profileDir.Exists)
 			{
-				if (dir.EnumerateFiles().Where(f => f.Name == "Login Data").Any())
+				foreach (var dir in profileDir.EnumerateDirectories())
 				{
-					yield return dir.Name;
+					if (dir.EnumerateFiles().Where(f => f.Name == "Login Data").Any())
+					{
+						yield return dir.Name;
+					}
 				}
 			}
 		}

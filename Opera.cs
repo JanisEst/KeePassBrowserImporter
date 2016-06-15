@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace KeePassBrowserImporter
 {
@@ -16,7 +15,7 @@ namespace KeePassBrowserImporter
 
 		public override IEnumerable<string> GetProfiles()
 		{
-			return Enumerable.Empty<string>();
+			throw new NotImplementedException();
 		}
 	}
 }

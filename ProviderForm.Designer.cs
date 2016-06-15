@@ -41,6 +41,8 @@
 			this.firefoxIconBox = new System.Windows.Forms.PictureBox();
 			this.firefoxRadioButton = new System.Windows.Forms.RadioButton();
 			this.profileGroupBox = new System.Windows.Forms.GroupBox();
+			this.profilePathLabel = new System.Windows.Forms.Label();
+			this.label6 = new System.Windows.Forms.Label();
 			this.searchProfileButton = new System.Windows.Forms.Button();
 			this.label2 = new System.Windows.Forms.Label();
 			this.profileComboBox = new System.Windows.Forms.ComboBox();
@@ -56,8 +58,6 @@
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.groupComboBox = new System.Windows.Forms.ComboBox();
 			this.label5 = new System.Windows.Forms.Label();
-			this.label6 = new System.Windows.Forms.Label();
-			this.profilePathLabel = new System.Windows.Forms.Label();
 			this.groupBox1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.chromiumIconBox)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.operaIconBox)).BeginInit();
@@ -155,10 +155,10 @@
 			this.chromeRadioButton.AutoSize = true;
 			this.chromeRadioButton.Location = new System.Drawing.Point(31, 81);
 			this.chromeRadioButton.Name = "chromeRadioButton";
-			this.chromeRadioButton.Size = new System.Drawing.Size(61, 17);
+			this.chromeRadioButton.Size = new System.Drawing.Size(150, 17);
 			this.chromeRadioButton.TabIndex = 4;
 			this.chromeRadioButton.TabStop = true;
-			this.chromeRadioButton.Text = "Chrome";
+			this.chromeRadioButton.Text = "Chrome / Chrome Portable";
 			this.chromeRadioButton.UseVisualStyleBackColor = true;
 			this.chromeRadioButton.CheckedChanged += new System.EventHandler(this.SelectBrowser_CheckedChanged);
 			// 
@@ -197,10 +197,10 @@
 			this.firefoxRadioButton.AutoSize = true;
 			this.firefoxRadioButton.Location = new System.Drawing.Point(31, 35);
 			this.firefoxRadioButton.Name = "firefoxRadioButton";
-			this.firefoxRadioButton.Size = new System.Drawing.Size(56, 17);
+			this.firefoxRadioButton.Size = new System.Drawing.Size(140, 17);
 			this.firefoxRadioButton.TabIndex = 0;
 			this.firefoxRadioButton.TabStop = true;
-			this.firefoxRadioButton.Text = "Firefox";
+			this.firefoxRadioButton.Text = "Firefox / Firefox Portable";
 			this.firefoxRadioButton.UseVisualStyleBackColor = true;
 			this.firefoxRadioButton.CheckedChanged += new System.EventHandler(this.SelectBrowser_CheckedChanged);
 			// 
@@ -217,6 +217,23 @@
 			this.profileGroupBox.TabIndex = 1;
 			this.profileGroupBox.TabStop = false;
 			this.profileGroupBox.Text = "Profile";
+			// 
+			// profilePathLabel
+			// 
+			this.profilePathLabel.Location = new System.Drawing.Point(9, 76);
+			this.profilePathLabel.Name = "profilePathLabel";
+			this.profilePathLabel.Size = new System.Drawing.Size(348, 13);
+			this.profilePathLabel.TabIndex = 4;
+			this.profilePathLabel.Text = "<>";
+			// 
+			// label6
+			// 
+			this.label6.AutoSize = true;
+			this.label6.Location = new System.Drawing.Point(9, 62);
+			this.label6.Name = "label6";
+			this.label6.Size = new System.Drawing.Size(64, 13);
+			this.label6.TabIndex = 3;
+			this.label6.Text = "Profile-Path:";
 			// 
 			// searchProfileButton
 			// 
@@ -370,23 +387,6 @@
 			this.label5.Size = new System.Drawing.Size(277, 13);
 			this.label5.TabIndex = 0;
 			this.label5.Text = "Select the group in which the entries should get imported.";
-			// 
-			// label6
-			// 
-			this.label6.AutoSize = true;
-			this.label6.Location = new System.Drawing.Point(9, 62);
-			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(64, 13);
-			this.label6.TabIndex = 3;
-			this.label6.Text = "Profile-Path:";
-			// 
-			// profilePathLabel
-			// 
-			this.profilePathLabel.Location = new System.Drawing.Point(9, 76);
-			this.profilePathLabel.Name = "profilePathLabel";
-			this.profilePathLabel.Size = new System.Drawing.Size(348, 13);
-			this.profilePathLabel.TabIndex = 4;
-			this.profilePathLabel.Text = "<>";
 			// 
 			// ProviderForm
 			// 

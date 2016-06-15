@@ -62,42 +62,27 @@ namespace KeePassBrowserImporter
 
 		public string SelectedProfile
 		{
-			get
-			{
-				return profileComboBox.SelectedItem as string;
-			}
+			get { return profileComboBox.SelectedItem as string; }
 		}
 
 		public string CustomProfilePath
 		{
-			get
-			{
-				return customProfilePath;
-			}
+			get { return customProfilePath; }
 		}
 
 		public string MasterPassword
 		{
-			get
-			{
-				return masterPasswordTextBox.Text;
-			}
+			get { return masterPasswordTextBox.Text; }
 		}
 
 		public bool ExtractTitle
 		{
-			get
-			{
-				return extractTitleCheckBox.Checked;
-			}
+			get { return extractTitleCheckBox.Checked; }
 		}
 
 		public bool ExtractIcon
 		{
-			get
-			{
-				return extractIconCheckBox.Checked;
-			}
+			get { return extractIconCheckBox.Checked; }
 		}
 
 		private string customProfilePath;
@@ -189,10 +174,14 @@ namespace KeePassBrowserImporter
 			if (provider.SupportsMultipleProfiles)
 			{
 				var profiles = provider.GetProfiles().ToArray();
-				profileComboBox.Items.AddRange(profiles);
 				if (profiles.Length > 0)
 				{
+					profileComboBox.Items.AddRange(profiles);
 					profileComboBox.SelectedIndex = 0;
+				}
+				else
+				{
+					profileComboBox.Enabled = false;
 				}
 			}
 

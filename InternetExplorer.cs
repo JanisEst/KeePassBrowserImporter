@@ -258,7 +258,7 @@ namespace KeePassBrowserImporter
 
 		public override string GetProfilePath(string profile)
 		{
-			return "not available";
+			throw new NotImplementedException();
 		}
 
 		public override bool UsesMasterPassword { get { return false; } }

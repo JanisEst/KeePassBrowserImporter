@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="BrowserProvider.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="ProfileNotFoundException.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
