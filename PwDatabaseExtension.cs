@@ -22,40 +22,44 @@ namespace KeePassBrowserImporter
 		/// <param name="host">The host</param>
 		/// <param name="username">The username</param>
 		/// <param name="password">The password</param>
-		/// <param name="extractTitle">true to extract the title of the host</param>
-		/// <param name="extractIcon">true to extract icon of the host</param>
+		/// <param name="creationSettings">Settings used while creating the entry</param>
 		/// <param name="logger">The logger</param>
-		public static void CreateWebsiteEntry(this PwDatabase pd, PwGroup group, string host, string username, string password, bool extractTitle, bool extractIcon, IStatusLogger logger)
+		public static void CreateWebsiteEntry(this PwDatabase pd, PwGroup group, EntryInfo entry, CreationSettings creationSettings, IStatusLogger logger)
 		{
 			Contract.Requires(group != null);
-			Contract.Requires(host != null);
-			Contract.Requires(username != null);
-			Contract.Requires(password != null);
+			Contract.Requires(entry != null);
+			Contract.Requires(creationSettings != null);
 			Contract.Requires(logger != null);
 
-			logger.SetText(string.Format("{0} - {1}", username, host), LogStatusType.Info);
+			logger.SetText(string.Format("{0} - {1}", entry.Username, entry.Hostname), LogStatusType.Info);
 
 			var pe = new PwEntry(true, true);
 			group.AddEntry(pe, true);
 
-			pe.Strings.Set(PwDefs.TitleField, new ProtectedString(pd.MemoryProtection.ProtectTitle, host));
-			pe.Strings.Set(PwDefs.UserNameField, new ProtectedString(pd.MemoryProtection.ProtectUserName, username));
-			pe.Strings.Set(PwDefs.PasswordField, new ProtectedString(pd.MemoryProtection.ProtectPassword, password));
-			pe.Strings.Set(PwDefs.UrlField, new ProtectedString(pd.MemoryProtection.ProtectUrl, host));
+			pe.Strings.Set(PwDefs.TitleField, new ProtectedString(pd.MemoryProtection.ProtectTitle, entry.Hostname));
+			pe.Strings.Set(PwDefs.UserNameField, new ProtectedString(pd.MemoryProtection.ProtectUserName, entry.Username));
+			pe.Strings.Set(PwDefs.PasswordField, new ProtectedString(pd.MemoryProtection.ProtectPassword, entry.Password));
+			pe.Strings.Set(PwDefs.UrlField, new ProtectedString(pd.MemoryProtection.ProtectUrl, entry.Hostname));
 
-			if (!string.IsNullOrEmpty(host) && (extractTitle || extractIcon))
+			if (creationSettings.UseDates)
+			{
+				pe.CreationTime = entry.Created;
+				pe.LastModificationTime = entry.Modified;
+			}
+
+			if (!string.IsNullOrEmpty(entry.Hostname) && (creationSettings.ExtractIcon || creationSettings.ExtractTitle))
 			{
 				try
 				{
 					string content;
 					using (var client = new WebClientEx())
 					{
-						content = client.DownloadString(host);
+						content = client.DownloadString(entry.Hostname);
 
 						var document = new HtmlDocument();
 						document.LoadHtml(content);
 
-						if (extractTitle)
+						if (creationSettings.ExtractTitle)
 						{
 							var title = document.DocumentNode.SelectSingleNode("/html/head/title");
 							if (title != null)
@@ -64,7 +68,7 @@ namespace KeePassBrowserImporter
 							}
 						}
 
-						if (extractIcon)
+						if (creationSettings.ExtractIcon)
 						{
 							string iconUrl = null;
 							foreach (var prio in new string[] { "shortcut icon", "apple-touch-icon", "icon" })
@@ -86,7 +90,7 @@ namespace KeePassBrowserImporter
 							{
 								if (!iconUrl.StartsWith("http://") && !iconUrl.StartsWith("https://"))
 								{
-									iconUrl = host.TrimEnd('/') + '/' + iconUrl.TrimStart('/');
+									iconUrl = entry.Hostname.TrimEnd('/') + '/' + iconUrl.TrimStart('/');
 								}
 
 								using (var s = client.OpenRead(iconUrl))

@@ -45,8 +45,12 @@ namespace KeePassBrowserImporter
 
 					Password = pf.MasterPassword,
 
-					ExtractTitle = pf.ExtractTitle,
-					ExtractIcon = pf.ExtractIcon
+					CreationSettings = new CreationSettings
+					{
+						ExtractTitle = pf.ExtractTitle,
+						ExtractIcon = pf.ExtractIcon,
+						UseDates = pf.UseDates
+					}
 				};
 
 				//could take some time if the webpages need to get crawled

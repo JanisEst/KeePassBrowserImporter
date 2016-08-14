@@ -85,6 +85,11 @@ namespace KeePassBrowserImporter
 			get { return extractIconCheckBox.Checked; }
 		}
 
+		public bool UseDates
+		{
+			get { return useDatesCheckBox.Checked; }
+		}
+
 		private string customProfilePath;
 
 		public ProviderForm(PwDatabase database)

@@ -25,6 +25,8 @@ namespace KeePassBrowserImporter
 		{
 			Contract.Requires(host != null);
 
+			//System.Diagnostics.Debugger.Launch();
+
 			this.host = host;
 
 			provider = new BrowserProvider();

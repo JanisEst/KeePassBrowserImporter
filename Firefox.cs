@@ -174,15 +174,12 @@ namespace KeePassBrowserImporter
 					throw new NetworkSecurityServicesException("PK11_Authenticate failed");
 				}
 
-				foreach (var item in ReadLoginsFile(currentProfilePath).Union(ReadSignonsFile(currentProfilePath)))
+				foreach (var entry in ReadLoginsFile(currentProfilePath).Union(ReadSignonsFile(currentProfilePath)))
 				{
 					param.Database.CreateWebsiteEntry(
 						param.Group,
-						item.Item1,
-						item.Item2,
-						item.Item3,
-						param.ExtractTitle,
-						param.ExtractIcon,
+						entry,
+						param.CreationSettings,
 						param.Logger
 					);
 				}
@@ -208,14 +205,14 @@ namespace KeePassBrowserImporter
 		/// </summary>
 		/// <param name="profilePath">Path of the profile folder</param>
 		/// <returns></returns>
-		private IEnumerable<Tuple<string, string, string>> ReadSignonsFile(string profilePath)
+		private IEnumerable<EntryInfo> ReadSignonsFile(string profilePath)
 		{
 			using (var db = new DBHandler(Path.Combine(profilePath, "signons.sqlite")))
 			{
 				DataTable dt = null;
 				try
 				{
-					db.Query(out dt, "SELECT hostname, encryptedUsername, encryptedPassword FROM moz_logins");
+					db.Query(out dt, "SELECT hostname, encryptedUsername, encryptedPassword, timeCreated, timePasswordChanged FROM moz_logins");
 				}
 				catch
 				{
@@ -224,21 +221,24 @@ namespace KeePassBrowserImporter
 
 				foreach (var row in dt.AsEnumerable())
 				{
-					Tuple<string, string, string> data;
+					EntryInfo entry;
 					try
 					{
-						data = Tuple.Create(
-							(row["hostname"] as string).Trim(),
-							PK11_Decrypt(row["encryptedUsername"] as string).Trim(),
-							PK11_Decrypt(row["encryptedPassword"] as string)
-						);
+						entry = new EntryInfo
+						{
+							Hostname = (row["hostname"] as string).Trim(),
+							Username = PK11_Decrypt(row["encryptedUsername"] as string).Trim(),
+							Password = PK11_Decrypt(row["encryptedPassword"] as string),
+							Created = DateUtils.FromUnixTimeMilliseconds((long)row["timeCreated"]),
+							Modified = DateUtils.FromUnixTimeMilliseconds((long)row["timePasswordChanged"])
+						};
 					}
 					catch
 					{
 						continue;
 					}
 
-					yield return data;
+					yield return entry;
 				}
 
 			}
@@ -249,7 +249,7 @@ namespace KeePassBrowserImporter
 		/// </summary>
 		/// <param name="profilePath">Path of the profile folder</param>
 		/// <returns></returns>
-		private IEnumerable<Tuple<string, string, string>> ReadLoginsFile(string profilePath)
+		private IEnumerable<EntryInfo> ReadLoginsFile(string profilePath)
 		{
 			var path = Path.Combine(profilePath, "logins.json");
 			if (File.Exists(path))
@@ -259,21 +259,24 @@ namespace KeePassBrowserImporter
 				var logins = root.Items["logins"].Value as JsonArray;
 				foreach (var item in logins.Values.Select(v => v.Value).Cast<JsonObject>())
 				{
-					Tuple<string, string, string> data;
+					EntryInfo entry;
 					try
 					{
-						data = Tuple.Create(
-							(item.Items["hostname"].Value as string).Trim(),
-							PK11_Decrypt(item.Items["encryptedUsername"].Value as string).Trim(),
-							PK11_Decrypt(item.Items["encryptedPassword"].Value as string)
-						);
+						entry = new EntryInfo
+						{
+							Hostname = (item.Items["hostname"].Value as string).Trim(),
+							Username = PK11_Decrypt(item.Items["encryptedUsername"].Value as string).Trim(),
+							Password = PK11_Decrypt(item.Items["encryptedPassword"].Value as string),
+							Created = DateUtils.FromUnixTimeMilliseconds((long)(item.Items["timeCreated"].Value as JsonNumber).Value),
+							Modified = DateUtils.FromUnixTimeMilliseconds((long)(item.Items["timePasswordChanged"].Value as JsonNumber).Value)
+						};
 					}
 					catch
 					{
 						continue;
 					}
 
-					yield return data;
+					yield return entry;
 				}
 			}
 		}

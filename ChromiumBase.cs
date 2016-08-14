@@ -58,17 +58,25 @@ namespace KeePassBrowserImporter
 			using (var db = new DBHandler(loginDataPath))
 			{
 				DataTable dt;
-				db.Query(out dt, "SELECT origin_url, username_value, password_value FROM logins");
+				db.Query(out dt, "SELECT origin_url, username_value, password_value, date_created FROM logins");
 
 				foreach (var row in dt.AsEnumerable())
 				{
+					var date = DateUtils.FromChromiumTime((long)row["date_created"]);
+
+					var entry = new EntryInfo
+					{
+						Hostname = row["origin_url"] as string,
+						Username = row["username_value"] as string,
+						Password = Encoding.UTF8.GetString(Cryptography.DecryptUserData(row["password_value"] as byte[])),
+						Created = date,
+						Modified = date
+					};
+
 					param.Database.CreateWebsiteEntry(
 						param.Group,
-						row["origin_url"] as string,
-						row["username_value"] as string,
-						Encoding.UTF8.GetString(Cryptography.DecryptUserData(row["password_value"] as byte[])),
-						param.ExtractTitle,
-						param.ExtractIcon,
+						entry,
+						param.CreationSettings,
 						param.Logger
 					);
 				}

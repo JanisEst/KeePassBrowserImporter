@@ -28,6 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.chromiumIconBox = new System.Windows.Forms.PictureBox();
@@ -58,6 +59,8 @@
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.groupComboBox = new System.Windows.Forms.ComboBox();
 			this.label5 = new System.Windows.Forms.Label();
+			this.useDatesCheckBox = new System.Windows.Forms.CheckBox();
+			this.infoToolTip = new System.Windows.Forms.ToolTip(this.components);
 			this.groupBox1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.chromiumIconBox)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.operaIconBox)).BeginInit();
@@ -262,6 +265,8 @@
 			this.profileComboBox.Name = "profileComboBox";
 			this.profileComboBox.Size = new System.Drawing.Size(279, 21);
 			this.profileComboBox.TabIndex = 0;
+			this.infoToolTip.SetToolTip(this.profileComboBox, "If your profile is not listed here use the button on the right to search for the " +
+        "path by yourself.");
 			this.profileComboBox.SelectedIndexChanged += new System.EventHandler(this.profileComboBox_SelectedIndexChanged);
 			// 
 			// masterPasswordGroupBox
@@ -281,6 +286,8 @@
 			this.masterPasswordTextBox.Name = "masterPasswordTextBox";
 			this.masterPasswordTextBox.Size = new System.Drawing.Size(279, 20);
 			this.masterPasswordTextBox.TabIndex = 1;
+			this.infoToolTip.SetToolTip(this.masterPasswordTextBox, "Some browsers let you specify a master password to protect the credentials.\r\nIf y" +
+        "ou have set a master password you need to provide it here.");
 			// 
 			// label3
 			// 
@@ -293,12 +300,13 @@
 			// 
 			// groupBox2
 			// 
+			this.groupBox2.Controls.Add(this.useDatesCheckBox);
 			this.groupBox2.Controls.Add(this.extractIconCheckBox);
 			this.groupBox2.Controls.Add(this.extractTitleCheckBox);
 			this.groupBox2.Controls.Add(this.label4);
 			this.groupBox2.Location = new System.Drawing.Point(12, 421);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(366, 94);
+			this.groupBox2.Size = new System.Drawing.Size(366, 117);
 			this.groupBox2.TabIndex = 3;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Settings";
@@ -313,6 +321,9 @@
 			this.extractIconCheckBox.Size = new System.Drawing.Size(170, 17);
 			this.extractIconCheckBox.TabIndex = 2;
 			this.extractIconCheckBox.Text = "Use website icon as entry icon";
+			this.infoToolTip.SetToolTip(this.extractIconCheckBox, "If enabled the entry will be created with the icon a browser shows in the titleba" +
+        "r for this website.\r\nIf this fails or no icon is available the default icon will" +
+        " be used.");
 			this.extractIconCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// extractTitleCheckBox
@@ -325,6 +336,9 @@
 			this.extractTitleCheckBox.Size = new System.Drawing.Size(162, 17);
 			this.extractTitleCheckBox.TabIndex = 1;
 			this.extractTitleCheckBox.Text = "Use website title as entry title";
+			this.infoToolTip.SetToolTip(this.extractTitleCheckBox, "If enabled the entry will be created with the title a browser shows in the titleb" +
+        "ar for this website.\r\nIf this fails or no title is available the url of the webs" +
+        "ite will be used.");
 			this.extractTitleCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// label4
@@ -332,15 +346,16 @@
 			this.label4.AutoSize = true;
 			this.label4.Location = new System.Drawing.Point(9, 16);
 			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(348, 26);
+			this.label4.Size = new System.Drawing.Size(353, 26);
 			this.label4.TabIndex = 0;
-			this.label4.Text = "Both settings need to connect to the webpage to extract the information.\r\nThis pr" +
+			this.label4.Text = "Some settings need to connect to the webpage to extract the information.\r\nThis pr" +
     "ocess could take some time, be patient.";
 			// 
 			// closeButton
 			// 
+			this.closeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.closeButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.closeButton.Location = new System.Drawing.Point(303, 521);
+			this.closeButton.Location = new System.Drawing.Point(303, 545);
 			this.closeButton.Name = "closeButton";
 			this.closeButton.Size = new System.Drawing.Size(75, 23);
 			this.closeButton.TabIndex = 5;
@@ -349,10 +364,11 @@
 			// 
 			// startButton
 			// 
+			this.startButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.startButton.DialogResult = System.Windows.Forms.DialogResult.OK;
 			this.startButton.Image = global::KeePassBrowserImporter.Properties.Resources.B16x16_Apply;
 			this.startButton.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.startButton.Location = new System.Drawing.Point(201, 521);
+			this.startButton.Location = new System.Drawing.Point(201, 545);
 			this.startButton.Name = "startButton";
 			this.startButton.Size = new System.Drawing.Size(96, 23);
 			this.startButton.TabIndex = 4;
@@ -388,13 +404,34 @@
 			this.label5.TabIndex = 0;
 			this.label5.Text = "Select the group in which the entries should get imported.";
 			// 
+			// useDatesCheckBox
+			// 
+			this.useDatesCheckBox.AutoSize = true;
+			this.useDatesCheckBox.Checked = true;
+			this.useDatesCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.useDatesCheckBox.Location = new System.Drawing.Point(11, 92);
+			this.useDatesCheckBox.Name = "useDatesCheckBox";
+			this.useDatesCheckBox.Size = new System.Drawing.Size(222, 17);
+			this.useDatesCheckBox.TabIndex = 3;
+			this.useDatesCheckBox.Text = "Use created / modified date from Browser";
+			this.infoToolTip.SetToolTip(this.useDatesCheckBox, "The entry in the database will be created with the created / modified date from t" +
+        "he browser.\r\nSome browsers only provide a created date while others don\'t provid" +
+        "e this info at all.");
+			this.useDatesCheckBox.UseVisualStyleBackColor = true;
+			// 
+			// infoToolTip
+			// 
+			this.infoToolTip.AutoPopDelay = 16000;
+			this.infoToolTip.InitialDelay = 200;
+			this.infoToolTip.ReshowDelay = 100;
+			// 
 			// ProviderForm
 			// 
 			this.AcceptButton = this.startButton;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.CancelButton = this.closeButton;
-			this.ClientSize = new System.Drawing.Size(389, 553);
+			this.ClientSize = new System.Drawing.Size(389, 577);
 			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.closeButton);
 			this.Controls.Add(this.startButton);
@@ -459,5 +496,7 @@
 		private System.Windows.Forms.Button searchProfileButton;
 		private System.Windows.Forms.Label profilePathLabel;
 		private System.Windows.Forms.Label label6;
+		private System.Windows.Forms.ToolTip infoToolTip;
+		private System.Windows.Forms.CheckBox useDatesCheckBox;
 	}
 }

@@ -135,7 +135,7 @@ namespace KeePassBrowserImporter
 
 		#endregion
 
-		#region Vault Passwords (Win8+)
+		#region Vault Passwords (Win7+)
 
 		private enum VAULT_ELEMENT_TYPE : uint
 		{
@@ -265,15 +265,12 @@ namespace KeePassBrowserImporter
 
 		public override void ImportCredentials(ImportParameter param)
 		{
-			foreach (var t in ReadRegistryPasswords().Union(ReadCredentialStorePasswords()).Union(ReadVaultPasswords()))
+			foreach (var entry in ReadRegistryPasswords().Union(ReadCredentialStorePasswords()).Union(ReadVaultPasswords()))
 			{
 				param.Database.CreateWebsiteEntry(
 					param.Group,
-					t.Item1,
-					t.Item2,
-					t.Item3,
-					param.ExtractTitle,
-					param.ExtractIcon,
+					entry,
+					param.CreationSettings,
 					param.Logger
 				);
 			}
@@ -331,7 +328,7 @@ namespace KeePassBrowserImporter
 		/// <summary>
 		/// Enumerates the auto complete passwords stored in the registry.
 		/// </summary>
-		private IEnumerable<Tuple<string, string, string>> ReadRegistryPasswords()
+		private IEnumerable<EntryInfo> ReadRegistryPasswords()
 		{
 			var hashToUrl = new Dictionary<string, string>();
 			using (var sha1 = new SHA1Managed())
@@ -389,7 +386,14 @@ namespace KeePassBrowserImporter
 
 										offset += Marshal.SizeOf(typeof(SecretEntry));
 
-										yield return Tuple.Create(url.Trim('\0').Trim(), username, password);
+										yield return new EntryInfo
+										{
+											Hostname = url.Trim('\0').Trim(),
+											Username = username,
+											Password = password,
+											Created = DateTime.Now,
+											Modified = DateTime.Now
+										};
 									}
 								}
 							}
@@ -402,7 +406,7 @@ namespace KeePassBrowserImporter
 		/// <summary>
 		/// Enumerates the HTTP Basic Authentication passwords stored in the credential store.
 		/// </summary>
-		private IEnumerable<Tuple<string, string, string>> ReadCredentialStorePasswords()
+		private IEnumerable<EntryInfo> ReadCredentialStorePasswords()
 		{
 			int count;
 			IntPtr credentials = IntPtr.Zero;
@@ -440,11 +444,16 @@ namespace KeePassBrowserImporter
 								var splitOffset = credStr.IndexOf(':');
 								if (splitOffset != -1)
 								{
-									yield return Tuple.Create(
-										cred.TargetName,
-										credStr.Substring(0, splitOffset),
-										credStr.Substring(splitOffset + 1)
-									);
+									var date = DateUtils.FromFileTime(cred.LastWritten);
+
+									yield return new EntryInfo
+									{
+										Hostname = cred.TargetName,
+										Username = credStr.Substring(0, splitOffset),
+										Password = credStr.Substring(splitOffset + 1),
+										Created = date,
+										Modified = date
+									};
 								}
 							}
 						}
@@ -463,7 +472,7 @@ namespace KeePassBrowserImporter
 		/// <summary>
 		/// Enumerates the passwords stored in the password vault.
 		/// </summary>
-		private IEnumerable<Tuple<string, string, string>> ReadVaultPasswords()
+		private IEnumerable<EntryInfo> ReadVaultPasswords()
 		{
 			if (!(Environment.OSVersion.Version.Major > 6 || (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor >= 1)))
 			{
@@ -502,6 +511,7 @@ namespace KeePassBrowserImporter
 											string host;
 											string username;
 											string password = string.Empty;
+											DateTime date = DateTime.Now;
 											if (isWin8)
 											{
 												var itemPtr = items + i * Marshal.SizeOf(typeof(VAULT_ITEM_W8));
@@ -522,6 +532,8 @@ namespace KeePassBrowserImporter
 													if (VaultGetItem8(vault, itemPtr, item.pResourceElement, item.pIdentityElement, IntPtr.Zero, IntPtr.Zero, 0, out propertyPtr) == ERROR_SUCCESS)
 													{
 														var property = (VAULT_ITEM_W8)Marshal.PtrToStructure(propertyPtr, typeof(VAULT_ITEM_W8));
+
+														date = DateUtils.FromFileTime(property.LastModified);
 
 														var authenticatorElement = (VAULT_ITEM_ELEMENT)Marshal.PtrToStructure(property.pAuthenticatorElement, typeof(VAULT_ITEM_ELEMENT));
 														password = authenticatorElement.ItemValue.String;
@@ -551,6 +563,8 @@ namespace KeePassBrowserImporter
 													{
 														var property = (VAULT_ITEM_W7)Marshal.PtrToStructure(propertyPtr, typeof(VAULT_ITEM_W7));
 
+														date = DateUtils.FromFileTime(property.LastModified);
+
 														var authenticatorElement = (VAULT_ITEM_ELEMENT)Marshal.PtrToStructure(property.pAuthenticatorElement, typeof(VAULT_ITEM_ELEMENT));
 														password = authenticatorElement.ItemValue.String;
 
@@ -559,7 +573,14 @@ namespace KeePassBrowserImporter
 												}
 											}
 
-											yield return Tuple.Create(host, username, password);
+											yield return new EntryInfo
+											{
+												Hostname = host,
+												Username = username,
+												Password = password,
+												Created = date,
+												Modified = date
+											};
 										}
 									}
 								}

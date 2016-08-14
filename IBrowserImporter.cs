@@ -4,6 +4,13 @@ using System.Collections.Generic;
 
 namespace KeePassBrowserImporter
 {
+	public class CreationSettings
+	{
+		public bool ExtractTitle;
+		public bool ExtractIcon;
+		public bool UseDates;
+	}
+
 	public class ImportParameter
 	{
 		public IStatusLogger Logger;
@@ -15,8 +22,8 @@ namespace KeePassBrowserImporter
 		public string CustomProfilePath;
 
 		public string Password;
-		public bool ExtractTitle;
-		public bool ExtractIcon;
+
+		public CreationSettings CreationSettings;
 	}
 
 	public abstract class IBrowserImporter
