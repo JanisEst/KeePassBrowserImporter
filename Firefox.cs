@@ -114,7 +114,11 @@ namespace KeePassBrowserImporter
 		/// <summary>Gets all subdirectories in the profiles directory.</summary>
 		public override IEnumerable<string> GetProfiles()
 		{
-			return Directory.EnumerateDirectories(profileDirectory).Select(s => Path.GetFileName(s));
+			if (Directory.Exists(profileDirectory))
+			{
+				return Directory.EnumerateDirectories(profileDirectory).Select(s => Path.GetFileName(s));
+			}
+			return Enumerable.Empty<string>();
 		}
 
 		public override string GetProfilePath(string profile)
