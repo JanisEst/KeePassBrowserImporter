@@ -1,8 +1,7 @@
 ﻿using System.Diagnostics.Contracts;
 using System.Drawing;
-
-using KeePass.Plugins;
 using KeePass.DataExchange;
+using KeePass.Plugins;
 
 namespace KeePassBrowserImporter
 {

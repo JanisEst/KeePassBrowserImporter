@@ -1,13 +1,13 @@
-﻿using KeePass.DataExchange;
-using KeePassLib;
-using KeePass.Resources;
-using System.Drawing;
-using KeePassLib.Interfaces;
+﻿using System.Drawing;
 using System.IO;
-using System.Windows.Forms;
-using System.Threading.Tasks;
-using System.Threading;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using KeePass.DataExchange;
+using KeePass.Resources;
+using KeePassLib;
+using KeePassLib.Interfaces;
 
 namespace KeePassBrowserImporter
 {

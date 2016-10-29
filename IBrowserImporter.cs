@@ -1,6 +1,6 @@
-﻿using KeePassLib;
+﻿using System.Collections.Generic;
+using KeePassLib;
 using KeePassLib.Interfaces;
-using System.Collections.Generic;
 
 namespace KeePassBrowserImporter
 {

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using KeePassLib;
+﻿using System.Data;
 using System.Diagnostics.Contracts;
 using System.IO;
-using System.Data;
+using System.Linq;
+using System.Text;
 
 namespace KeePassBrowserImporter
 {

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Win32;
-using System.Diagnostics.Contracts;
-using System.Security.Cryptography;
-
 using FileTime = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 namespace KeePassBrowserImporter
