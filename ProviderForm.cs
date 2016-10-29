@@ -119,15 +119,8 @@ namespace KeePassBrowserImporter
 
 			for (int i = 0; i < providers.Count; ++i)
 			{
-				if (providers[i].IsAvailable == false)
-				{
-					browserRadioButtons[i].Enabled = false;
-				}
-
 				browserRadioButtons[i].Tag = providers[i];
 			}
-
-			masterPasswordTextBox.UseSystemPasswordChar = true;
 
 			FillGroupComboBox(database.RootGroup, 0);
 			var preselectedGroup = database.LastSelectedGroup.Equals(PwUuid.Zero) ? database.RootGroup.Uuid : database.LastSelectedGroup;

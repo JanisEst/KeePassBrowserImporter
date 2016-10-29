@@ -244,8 +244,6 @@ namespace KeePassBrowserImporter
 
 		#endregion
 
-		public override bool IsAvailable { get { return Environment.OSVersion.Platform == PlatformID.Win32NT; } }
-
 		public override bool SupportsProfiles { get { return false; } }
 
 		public override bool SupportsMultipleProfiles { get { return false; } }

@@ -28,9 +28,6 @@ namespace KeePassBrowserImporter
 
 	public abstract class IBrowserImporter
 	{
-		/// <summary>Checks if the importer is available.</summary>
-		public abstract bool IsAvailable { get; }
-
 		/// <summary>Checks if the importer supports profiles.</summary>
 		public abstract bool SupportsProfiles { get; }
 

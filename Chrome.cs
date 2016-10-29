@@ -12,8 +12,6 @@ namespace KeePassBrowserImporter
 		{
 		}
 
-		public override bool IsAvailable { get { return true; } } //Chrome Portable could be available
-
 		public override bool SupportsMultipleProfiles { get { return true; } }
 
 		/// <summary>Gets the folders which contain the "Login Data" file.</summary>

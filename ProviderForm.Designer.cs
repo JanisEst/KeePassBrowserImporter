@@ -51,6 +51,7 @@
 			this.masterPasswordTextBox = new System.Windows.Forms.TextBox();
 			this.label3 = new System.Windows.Forms.Label();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.useDatesCheckBox = new System.Windows.Forms.CheckBox();
 			this.extractIconCheckBox = new System.Windows.Forms.CheckBox();
 			this.extractTitleCheckBox = new System.Windows.Forms.CheckBox();
 			this.label4 = new System.Windows.Forms.Label();
@@ -59,7 +60,6 @@
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.groupComboBox = new System.Windows.Forms.ComboBox();
 			this.label5 = new System.Windows.Forms.Label();
-			this.useDatesCheckBox = new System.Windows.Forms.CheckBox();
 			this.infoToolTip = new System.Windows.Forms.ToolTip(this.components);
 			this.groupBox1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.chromiumIconBox)).BeginInit();
@@ -120,6 +120,7 @@
 			this.chromiumRadioButton.TabIndex = 8;
 			this.chromiumRadioButton.TabStop = true;
 			this.chromiumRadioButton.Text = "Chromium";
+			this.infoToolTip.SetToolTip(this.chromiumRadioButton, "Portable Profile Path: ChromiumPortable\\Data\\Profiles\\Default");
 			this.chromiumRadioButton.UseVisualStyleBackColor = true;
 			this.chromiumRadioButton.CheckedChanged += new System.EventHandler(this.SelectBrowser_CheckedChanged);
 			// 
@@ -141,6 +142,7 @@
 			this.operaRadioButton.TabIndex = 6;
 			this.operaRadioButton.TabStop = true;
 			this.operaRadioButton.Text = "Opera";
+			this.infoToolTip.SetToolTip(this.operaRadioButton, "Portable Profile Path: OperaPortable\\Data\\profile\\data");
 			this.operaRadioButton.UseVisualStyleBackColor = true;
 			this.operaRadioButton.CheckedChanged += new System.EventHandler(this.SelectBrowser_CheckedChanged);
 			// 
@@ -158,10 +160,11 @@
 			this.chromeRadioButton.AutoSize = true;
 			this.chromeRadioButton.Location = new System.Drawing.Point(31, 81);
 			this.chromeRadioButton.Name = "chromeRadioButton";
-			this.chromeRadioButton.Size = new System.Drawing.Size(150, 17);
+			this.chromeRadioButton.Size = new System.Drawing.Size(61, 17);
 			this.chromeRadioButton.TabIndex = 4;
 			this.chromeRadioButton.TabStop = true;
-			this.chromeRadioButton.Text = "Chrome / Chrome Portable";
+			this.chromeRadioButton.Text = "Chrome";
+			this.infoToolTip.SetToolTip(this.chromeRadioButton, "Portable Profile Path: GoogleChromePortable\\Data\\profile\\Default");
 			this.chromeRadioButton.UseVisualStyleBackColor = true;
 			this.chromeRadioButton.CheckedChanged += new System.EventHandler(this.SelectBrowser_CheckedChanged);
 			// 
@@ -200,10 +203,11 @@
 			this.firefoxRadioButton.AutoSize = true;
 			this.firefoxRadioButton.Location = new System.Drawing.Point(31, 35);
 			this.firefoxRadioButton.Name = "firefoxRadioButton";
-			this.firefoxRadioButton.Size = new System.Drawing.Size(140, 17);
+			this.firefoxRadioButton.Size = new System.Drawing.Size(56, 17);
 			this.firefoxRadioButton.TabIndex = 0;
 			this.firefoxRadioButton.TabStop = true;
-			this.firefoxRadioButton.Text = "Firefox / Firefox Portable";
+			this.firefoxRadioButton.Text = "Firefox";
+			this.infoToolTip.SetToolTip(this.firefoxRadioButton, "Portable Profile Path: FirefoxPortable\\Data\\profile");
 			this.firefoxRadioButton.UseVisualStyleBackColor = true;
 			this.firefoxRadioButton.CheckedChanged += new System.EventHandler(this.SelectBrowser_CheckedChanged);
 			// 
@@ -288,6 +292,7 @@
 			this.masterPasswordTextBox.TabIndex = 1;
 			this.infoToolTip.SetToolTip(this.masterPasswordTextBox, "Some browsers let you specify a master password to protect the credentials.\r\nIf y" +
         "ou have set a master password you need to provide it here.");
+			this.masterPasswordTextBox.UseSystemPasswordChar = true;
 			// 
 			// label3
 			// 
@@ -310,6 +315,21 @@
 			this.groupBox2.TabIndex = 3;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Settings";
+			// 
+			// useDatesCheckBox
+			// 
+			this.useDatesCheckBox.AutoSize = true;
+			this.useDatesCheckBox.Checked = true;
+			this.useDatesCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.useDatesCheckBox.Location = new System.Drawing.Point(11, 92);
+			this.useDatesCheckBox.Name = "useDatesCheckBox";
+			this.useDatesCheckBox.Size = new System.Drawing.Size(222, 17);
+			this.useDatesCheckBox.TabIndex = 3;
+			this.useDatesCheckBox.Text = "Use created / modified date from Browser";
+			this.infoToolTip.SetToolTip(this.useDatesCheckBox, "The entry in the database will be created with the created / modified date from t" +
+        "he browser.\r\nSome browsers only provide a created date while others don\'t provid" +
+        "e this info at all.");
+			this.useDatesCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// extractIconCheckBox
 			// 
@@ -403,21 +423,6 @@
 			this.label5.Size = new System.Drawing.Size(277, 13);
 			this.label5.TabIndex = 0;
 			this.label5.Text = "Select the group in which the entries should get imported.";
-			// 
-			// useDatesCheckBox
-			// 
-			this.useDatesCheckBox.AutoSize = true;
-			this.useDatesCheckBox.Checked = true;
-			this.useDatesCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.useDatesCheckBox.Location = new System.Drawing.Point(11, 92);
-			this.useDatesCheckBox.Name = "useDatesCheckBox";
-			this.useDatesCheckBox.Size = new System.Drawing.Size(222, 17);
-			this.useDatesCheckBox.TabIndex = 3;
-			this.useDatesCheckBox.Text = "Use created / modified date from Browser";
-			this.infoToolTip.SetToolTip(this.useDatesCheckBox, "The entry in the database will be created with the created / modified date from t" +
-        "he browser.\r\nSome browsers only provide a created date while others don\'t provid" +
-        "e this info at all.");
-			this.useDatesCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// infoToolTip
 			// 

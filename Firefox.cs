@@ -105,8 +105,6 @@ namespace KeePassBrowserImporter
 			profileDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"Mozilla\Firefox\Profiles");
 		}
 
-		public override bool IsAvailable { get { return true; } } //Firefox Portable could be available
-
 		public override bool SupportsProfiles { get { return true; } }
 
 		public override bool SupportsMultipleProfiles { get { return true; } }

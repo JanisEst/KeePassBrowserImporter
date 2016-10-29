@@ -25,8 +25,6 @@ namespace KeePassBrowserImporter
 			return Path.Combine(ProfilePath, profile);
 		}
 
-		public override bool IsAvailable { get { return Directory.Exists(path); } }
-
 		public override bool UsesMasterPassword { get { return false; } }
 
 		/// <summary>
