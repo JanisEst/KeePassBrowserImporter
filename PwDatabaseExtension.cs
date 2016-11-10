@@ -54,7 +54,7 @@ namespace KeePassBrowserImporter
 					string content;
 					using (var client = new WebClientEx())
 					{
-						content = client.DownloadString(entry.Hostname);
+						content = client.DownloadStringAwareOfEncoding(entry.Hostname);
 
 						var document = new HtmlDocument();
 						document.LoadHtml(content);
