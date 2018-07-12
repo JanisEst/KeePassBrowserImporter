@@ -62,9 +62,6 @@ namespace KeePassBrowserImporter
 		[DllImport(NSS3_DLL, CallingConvention = CallingConvention.Cdecl)]
 		private static extern SECStatus NSS_Shutdown();
 
-		[DllImport(NSS3_DLL, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-		private static extern IntPtr NSSBase64_DecodeBuffer(IntPtr arenaOpt, IntPtr result, string inStr, uint inLen);
-
 		[DllImport(NSS3_DLL, CallingConvention = CallingConvention.Cdecl)]
 		private static extern SECStatus PK11_Authenticate(IntPtr slot, bool loadCerts, IntPtr context);
 
@@ -78,10 +75,7 @@ namespace KeePassBrowserImporter
 		private static extern IntPtr PK11_GetInternalKeySlot();
 
 		[DllImport(NSS3_DLL, CallingConvention = CallingConvention.Cdecl)]
-		private static extern SECStatus PK11SDR_Decrypt(IntPtr data, ref SECItem result, IntPtr context);
-
-		[DllImport(NSS3_DLL, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void SECITEM_FreeItem(IntPtr item, bool freeit);
+		private static extern SECStatus PK11SDR_Decrypt(ref SECItem data, ref SECItem result, IntPtr context);
 
 		[DllImport(NSS3_DLL, CallingConvention = CallingConvention.Cdecl)]
 		private static extern void SECITEM_FreeItem(ref SECItem item, bool freeit);
@@ -97,7 +91,7 @@ namespace KeePassBrowserImporter
 			}
 		}
 
-		private string profileDirectory;
+		private readonly string profileDirectory;
 
 		/// <summary>Constructs the object and builds the profile path.</summary>
 		public Firefox()
@@ -291,37 +285,42 @@ namespace KeePassBrowserImporter
 		private string PK11_Decrypt(string cipheredText)
 		{
 			var reply = default(SECItem);
-			var request = NSSBase64_DecodeBuffer(IntPtr.Zero, IntPtr.Zero, cipheredText, (uint)cipheredText.Length);
 
-			string result;
+			var rawData = Convert.FromBase64String(cipheredText);
+
+			var handle = GCHandle.Alloc(rawData, GCHandleType.Pinned);
 			try
 			{
-				PK11SDR_Decrypt(request, ref reply, IntPtr.Zero);
+				var request = new SECItem
+				{
+					Data = handle.AddrOfPinnedObject(),
+					Length = rawData.Length
+				};
 
-				try
-				{
-					byte[] tmp = new byte[reply.Length];
-					Marshal.Copy(reply.Data, tmp, 0, reply.Length);
-					result = System.Text.Encoding.UTF8.GetString(tmp);
-				}
-				finally
-				{
-					SECITEM_FreeItem(ref reply, false);
-				}
+				PK11SDR_Decrypt(ref request, ref reply, IntPtr.Zero);
+
+				var tmp = new byte[reply.Length];
+				Marshal.Copy(reply.Data, tmp, 0, reply.Length);
+				return System.Text.Encoding.UTF8.GetString(tmp);
 			}
 			finally
 			{
-				if (request != IntPtr.Zero)
+				if (handle.IsAllocated)
 				{
-					SECITEM_FreeItem(request, true);
+					handle.Free();
 				}
 				if (reply.Data != IntPtr.Zero)
 				{
-					Marshal.FreeHGlobal(reply.Data);
+					try
+					{
+						SECITEM_FreeItem(ref reply, false);
+					}
+					catch
+					{
+						
+					}
 				}
 			}
-
-			return result;
 		}
 	}
 }
