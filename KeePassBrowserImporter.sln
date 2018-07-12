@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeePassBrowserImporter", "KeePassBrowserImporter.csproj", "{6A249FA1-3F87-4C81-8D31-6BDF62308F38}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeePass", "..\KeePass-2.34-Source\KeePass\KeePass.csproj", "{10938016-DEE2-4A25-9A5A-8FD3444379CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeePass", "..\KeePass\KeePass\KeePass.csproj", "{10938016-DEE2-4A25-9A5A-8FD3444379CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,5 +24,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {185218D5-2DC0-44BE-BB36-20BDF67BCE41}
 	EndGlobalSection
 EndGlobal
