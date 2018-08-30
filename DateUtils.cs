@@ -3,7 +3,7 @@ using System.Runtime.InteropServices.ComTypes;
 
 namespace KeePassBrowserImporter
 {
-	static class DateUtils
+	internal static class DateUtils
 	{
 		private const long DaysPerYear = 365;
 		private const long DaysPer4Years = DaysPerYear * 4 + 1;

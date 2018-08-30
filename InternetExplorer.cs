@@ -10,7 +10,7 @@ using FileTime = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 namespace KeePassBrowserImporter
 {
-	class InternetExplorer : IBrowserImporter
+	internal class InternetExplorer : IBrowserImporter
 	{
 		#region Extern
 

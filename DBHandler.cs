@@ -5,7 +5,7 @@ using System.Data.SQLite;
 namespace KeePassBrowserImporter
 {
 	/// <summary>A helper class for SQLite databases.</summary>
-	class DBHandler : IDisposable
+	internal class DBHandler : IDisposable
 	{
 		private SQLiteConnection connection;
 
