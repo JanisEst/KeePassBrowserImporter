@@ -1,6 +1,6 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -62,15 +62,9 @@ namespace KeePassBrowserImporter
 					Application.DoEvents();
 				}
 
-				var exp = task.Exception;
-				if (exp != null)
+				if (task.IsFaulted)
 				{
-					if (exp.InnerExceptions.Count > 0)
-					{
-						throw exp.InnerExceptions.First();
-					}
-					
-					throw exp;
+					throw new Exception("Error while importing credentials from browser.", task.Exception?.InnerException);
 				}
 			}
 		}

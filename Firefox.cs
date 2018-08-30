@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.Common;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -201,42 +202,42 @@ namespace KeePassBrowserImporter
 		/// </summary>
 		/// <param name="profilePath">Path of the profile folder</param>
 		/// <returns></returns>
-		private IEnumerable<EntryInfo> ReadSignonsFile(string profilePath)
+		private IList<EntryInfo> ReadSignonsFile(string profilePath)
 		{
-			using (var db = new DBHandler(Path.Combine(profilePath, "signons.sqlite")))
+			try
 			{
-				DataTable dt = null;
-				try
+				using (var db = new DBHandler(Path.Combine(profilePath, "signons.sqlite")))
 				{
+					var entries = new List<EntryInfo>();
+
+					DataTable dt;
 					db.Query(out dt, "SELECT hostname, encryptedUsername, encryptedPassword, timeCreated, timePasswordChanged FROM moz_logins");
-				}
-				catch
-				{
-					yield break;
-				}
 
-				foreach (var row in dt.AsEnumerable())
-				{
-					EntryInfo entry;
-					try
+					foreach (var row in dt.AsEnumerable())
 					{
-						entry = new EntryInfo
+						try
 						{
-							Hostname = (row["hostname"] as string).Trim(),
-							Username = PK11_Decrypt(row["encryptedUsername"] as string).Trim(),
-							Password = PK11_Decrypt(row["encryptedPassword"] as string),
-							Created = DateUtils.FromUnixTimeMilliseconds((long)row["timeCreated"]),
-							Modified = DateUtils.FromUnixTimeMilliseconds((long)row["timePasswordChanged"])
-						};
-					}
-					catch
-					{
-						continue;
+							entries.Add(new EntryInfo
+							{
+								Hostname = (row["hostname"] as string).Trim(),
+								Username = PK11_Decrypt(row["encryptedUsername"] as string).Trim(),
+								Password = PK11_Decrypt(row["encryptedPassword"] as string),
+								Created = DateUtils.FromUnixTimeMilliseconds((long)row["timeCreated"]),
+								Modified = DateUtils.FromUnixTimeMilliseconds((long)row["timePasswordChanged"])
+							});
+						}
+						catch
+						{
+							// Skip faulty entries
+						}
 					}
 
-					yield return entry;
+					return entries;
 				}
-
+			}
+			catch (DbException ex)
+			{
+				throw new Exception("Error while using the browsers login database. It may help to close all running instances of the browser.", ex);
 			}
 		}
 
@@ -245,8 +246,10 @@ namespace KeePassBrowserImporter
 		/// </summary>
 		/// <param name="profilePath">Path of the profile folder</param>
 		/// <returns></returns>
-		private IEnumerable<EntryInfo> ReadLoginsFile(string profilePath)
+		private IList<EntryInfo> ReadLoginsFile(string profilePath)
 		{
+			var entries = new List<EntryInfo>();
+
 			var path = Path.Combine(profilePath, "logins.json");
 			if (File.Exists(path))
 			{
@@ -255,26 +258,25 @@ namespace KeePassBrowserImporter
 				var logins = root.Items["logins"].Value as JsonArray;
 				foreach (var item in logins.Values.Select(v => v.Value).Cast<JsonObject>())
 				{
-					EntryInfo entry;
 					try
 					{
-						entry = new EntryInfo
+						entries.Add(new EntryInfo
 						{
 							Hostname = (item.Items["hostname"].Value as string).Trim(),
 							Username = PK11_Decrypt(item.Items["encryptedUsername"].Value as string).Trim(),
 							Password = PK11_Decrypt(item.Items["encryptedPassword"].Value as string),
 							Created = DateUtils.FromUnixTimeMilliseconds((long)(item.Items["timeCreated"].Value as JsonNumber).Value),
 							Modified = DateUtils.FromUnixTimeMilliseconds((long)(item.Items["timePasswordChanged"].Value as JsonNumber).Value)
-						};
+						});
 					}
 					catch
 					{
-						continue;
+						// Skip faulty entries
 					}
-
-					yield return entry;
 				}
 			}
+
+			return entries;
 		}
 
 		/// <summary>
@@ -282,7 +284,7 @@ namespace KeePassBrowserImporter
 		/// </summary>
 		/// <param name="cipheredText">The ciphered text</param>
 		/// <returns>A decrypted string</returns>
-		private string PK11_Decrypt(string cipheredText)
+		private static string PK11_Decrypt(string cipheredText)
 		{
 			var reply = default(SECItem);
 

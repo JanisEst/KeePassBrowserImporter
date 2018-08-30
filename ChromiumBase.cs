@@ -1,21 +1,21 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
+using System.Data.Common;
 using System.Diagnostics.Contracts;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace KeePassBrowserImporter
 {
 	internal abstract class ChromiumBase : IBrowserImporter
 	{
-		private string path;
-		public string ProfilePath { get { return path; } }
+		public string ProfilePath { get; }
 
-		public ChromiumBase(string path)
+		protected ChromiumBase(string path)
 		{
 			Contract.Requires(!string.IsNullOrEmpty(path));
 
-			this.path = path;
+			ProfilePath = path;
 		}
 
 		public override bool SupportsProfiles { get { return true; } }
@@ -50,31 +50,38 @@ namespace KeePassBrowserImporter
 				throw new ProfileNotFoundException(loginDataPath);
 			}
 
-			using (var db = new DBHandler(loginDataPath))
+			try
 			{
-				DataTable dt;
-				db.Query(out dt, "SELECT origin_url, username_value, password_value, date_created FROM logins");
-
-				foreach (var row in dt.AsEnumerable())
+				using (var db = new DBHandler(loginDataPath))
 				{
-					var date = DateUtils.FromChromiumTime((long)row["date_created"]);
+					DataTable dt;
+					db.Query(out dt, "SELECT origin_url, username_value, password_value, date_created FROM logins");
 
-					var entry = new EntryInfo
+					foreach (var row in dt.AsEnumerable())
 					{
-						Hostname = row["origin_url"] as string,
-						Username = row["username_value"] as string,
-						Password = Encoding.UTF8.GetString(Cryptography.DecryptUserData(row["password_value"] as byte[])),
-						Created = date,
-						Modified = date
-					};
+						var date = DateUtils.FromChromiumTime((long)row["date_created"]);
 
-					param.Database.CreateWebsiteEntry(
-						param.Group,
-						entry,
-						param.CreationSettings,
-						param.Logger
-					);
+						var entry = new EntryInfo
+						{
+							Hostname = row["origin_url"] as string,
+							Username = row["username_value"] as string,
+							Password = Encoding.UTF8.GetString(Cryptography.DecryptUserData(row["password_value"] as byte[])),
+							Created = date,
+							Modified = date
+						};
+
+						param.Database.CreateWebsiteEntry(
+							param.Group,
+							entry,
+							param.CreationSettings,
+							param.Logger
+						);
+					}
 				}
+			}
+			catch (DbException ex)
+			{
+				throw new Exception("Error while using the browsers login database. It may help to close all running instances of the browser.", ex);
 			}
 		}
 	}
