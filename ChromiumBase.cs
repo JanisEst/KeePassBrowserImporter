@@ -9,13 +9,14 @@ namespace KeePassBrowserImporter
 {
 	internal abstract class ChromiumBase : IBrowserImporter
 	{
-		public string ProfilePath { get; }
+		private string path;
+		public string ProfilePath { get { return path; } }
 
 		protected ChromiumBase(string path)
 		{
 			Contract.Requires(!string.IsNullOrEmpty(path));
 
-			ProfilePath = path;
+			this.path = path;
 		}
 
 		public override bool SupportsProfiles { get { return true; } }
