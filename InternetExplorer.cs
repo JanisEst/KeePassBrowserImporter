@@ -511,7 +511,7 @@ namespace KeePassBrowserImporter
 											DateTime date = DateTime.Now;
 											if (isWin8)
 											{
-												var itemPtr = items + i * Marshal.SizeOf(typeof(VAULT_ITEM_W8));
+												var itemPtr = items + j * Marshal.SizeOf(typeof(VAULT_ITEM_W8));
 												var item = (VAULT_ITEM_W8)Marshal.PtrToStructure(itemPtr, typeof(VAULT_ITEM_W8));
 												if (!Vault_WebCredential_ID.Equals(new Guid(item.SchemaId)))
 												{
@@ -525,7 +525,7 @@ namespace KeePassBrowserImporter
 
 												if (item.dwPropertiesCount > 0)
 												{
-													IntPtr propertyPtr;
+													IntPtr propertyPtr = IntPtr.Zero;
 													if (VaultGetItem8(vault, itemPtr, item.pResourceElement, item.pIdentityElement, IntPtr.Zero, IntPtr.Zero, 0, out propertyPtr) == ERROR_SUCCESS)
 													{
 														var property = (VAULT_ITEM_W8)Marshal.PtrToStructure(propertyPtr, typeof(VAULT_ITEM_W8));
@@ -541,7 +541,7 @@ namespace KeePassBrowserImporter
 											}
 											else
 											{
-												var itemPtr = items + i * Marshal.SizeOf(typeof(VAULT_ITEM_W7));
+												var itemPtr = items + j * Marshal.SizeOf(typeof(VAULT_ITEM_W7));
 												var item = (VAULT_ITEM_W7)Marshal.PtrToStructure(itemPtr, typeof(VAULT_ITEM_W7));
 												if (!Vault_WebCredential_ID.Equals(new Guid(item.SchemaId)))
 												{
@@ -555,7 +555,7 @@ namespace KeePassBrowserImporter
 
 												if (item.dwPropertiesCount > 0)
 												{
-													IntPtr propertyPtr;
+													IntPtr propertyPtr = IntPtr.Zero;
 													if (VaultGetItem7(vault, itemPtr, item.pResourceElement, item.pIdentityElement, IntPtr.Zero, 0, out propertyPtr) == ERROR_SUCCESS)
 													{
 														var property = (VAULT_ITEM_W7)Marshal.PtrToStructure(propertyPtr, typeof(VAULT_ITEM_W7));
