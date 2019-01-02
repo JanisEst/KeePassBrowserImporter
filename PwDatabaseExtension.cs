@@ -9,6 +9,7 @@ using HtmlAgilityPack;
 using KeePassLib;
 using KeePassLib.Interfaces;
 using KeePassLib.Security;
+using KeePassLib.Utility;
 
 namespace KeePassBrowserImporter
 {
@@ -43,8 +44,8 @@ namespace KeePassBrowserImporter
 
 			if (creationSettings.UseDates)
 			{
-				pe.CreationTime = entry.Created;
-				pe.LastModificationTime = entry.Modified;
+				pe.CreationTime = TimeUtil.ToUtc(entry.Created, false);
+				pe.LastModificationTime = TimeUtil.ToUtc(entry.Modified, false);
 			}
 
 			if (!string.IsNullOrEmpty(entry.Hostname) && (creationSettings.ExtractIcon || creationSettings.ExtractTitle))
