@@ -11,9 +11,9 @@ namespace KeePassBrowserImporter
 		private const long DaysPer400Years = DaysPer100Years * 4 + 1;
 		private const long DaysTo1970 = DaysPer400Years * 4 + DaysPer100Years * 3 + DaysPer4Years * 17 + DaysPerYear;
 		private const long UnixEpochTicks = TimeSpan.TicksPerDay * DaysTo1970;
-		private const long kMillisecondsPerSecond = 1000;
-		private const long kMicrosecondsPerMillisecond = 1000;
-		private const long MicrosecondsPerSecond = kMicrosecondsPerMillisecond * kMillisecondsPerSecond;
+		private const long MillisecondsPerSecond = 1000;
+		private const long MicrosecondsPerMillisecond = 1000;
+		private const long MicrosecondsPerSecond = MicrosecondsPerMillisecond * MillisecondsPerSecond;
 		private const long TimeToMicrosecondsOffset = 11644473600000000;
 
 		/// <summary>Create a DateTime from the given unix time seconds.</summary>
@@ -21,12 +21,12 @@ namespace KeePassBrowserImporter
 		{
 			if (seconds == 0)
 			{
-				return DateTime.Now;
+				return DateTime.UtcNow;
 			}
 
 			// should use DateTimeOffset.FromUnixTimeSeconds (.NET 4.6)
 			long ticks = seconds * TimeSpan.TicksPerSecond + UnixEpochTicks;
-			return new DateTime(ticks, DateTimeKind.Utc).ToLocalTime();
+			return new DateTime(ticks, DateTimeKind.Utc);
 		}
 
 		/// <summary>Create a DateTime from the given unix time milliseconds.</summary>
@@ -34,12 +34,12 @@ namespace KeePassBrowserImporter
 		{
 			if (milliseconds == 0)
 			{
-				return DateTime.Now;
+				return DateTime.UtcNow;
 			}
 
 			// should use DateTimeOffset.FromUnixTimeMilliseconds (.NET 4.6)
 			long ticks = milliseconds * TimeSpan.TicksPerMillisecond + UnixEpochTicks;
-			return new DateTime(ticks, DateTimeKind.Utc).ToLocalTime();
+			return new DateTime(ticks, DateTimeKind.Utc);
 		}
 
 		/// <summary>Create a DateTime from the given filetime.</summary>
@@ -54,7 +54,7 @@ namespace KeePassBrowserImporter
 		{
 			if (microseconds == 0)
 			{
-				return DateTime.Now;
+				return DateTime.UtcNow;
 			}
 
 			long milliseconds = (microseconds - TimeToMicrosecondsOffset) / MicrosecondsPerSecond;

@@ -388,8 +388,8 @@ namespace KeePassBrowserImporter
 											Hostname = url.Trim('\0').Trim(),
 											Username = username,
 											Password = password,
-											Created = DateTime.Now,
-											Modified = DateTime.Now
+											Created = DateTime.UtcNow,
+											Modified = DateTime.UtcNow
 										};
 									}
 								}
@@ -508,7 +508,7 @@ namespace KeePassBrowserImporter
 											string host;
 											string username;
 											string password = string.Empty;
-											DateTime date = DateTime.Now;
+											DateTime date = DateTime.UtcNow;
 											if (isWin8)
 											{
 												var itemPtr = items + j * Marshal.SizeOf(typeof(VAULT_ITEM_W8));
