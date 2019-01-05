@@ -11,7 +11,7 @@ namespace KeePassBrowserImporter
 
 		public DBHandler(string database)
 		{
-			connection = new SQLiteConnection("Data Source=" + database);
+			connection = new SQLiteConnection("FailIfMissing=True; Data Source=" + database);
 			connection.Open();
 		}
 
