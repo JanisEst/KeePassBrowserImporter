@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
+using KeePassLib.Utility;
 using Microsoft.Win32;
 using FileTime = System.Runtime.InteropServices.ComTypes.FILETIME;
 
@@ -262,14 +263,42 @@ namespace KeePassBrowserImporter
 
 		public override void ImportCredentials(ImportParameter param)
 		{
-			foreach (var entry in ReadRegistryPasswords().Union(ReadCredentialStorePasswords()).Union(ReadVaultPasswords()))
+			var exceptions = new List<Exception>();
+			ImportCredentialsImpl(param, ReadRegistryPasswords, ref exceptions);
+			ImportCredentialsImpl(param, ReadCredentialStorePasswords, ref exceptions);
+			ImportCredentialsImpl(param, ReadVaultPasswords, ref exceptions);
+
+			if (exceptions.Any())
 			{
-				param.Database.CreateWebsiteEntry(
-					param.Group,
-					entry,
-					param.CreationSettings,
-					param.Logger
-				);
+				var combinedMessages = string.Join("\n\n", exceptions.Select(StrUtil.FormatException));
+
+				throw new Exception(combinedMessages);
+			}
+		}
+
+		/// <summary>
+		/// Imports the credentials provided by the <see cref="importFunc"/>.
+		/// </summary>
+		/// <param name="param">The parameters for the import</param>
+		/// <param name="importFunc">The provider for the credential entries.</param>
+		/// <param name="occuredExceptions">List with occured exceptions.</param>
+		private static void ImportCredentialsImpl(ImportParameter param, Func<IEnumerable<EntryInfo>> importFunc, ref List<Exception> occuredExceptions)
+		{
+			try
+			{
+				foreach (var entry in importFunc())
+				{
+					param.Database.CreateWebsiteEntry(
+						param.Group,
+						entry,
+						param.CreationSettings,
+						param.Logger
+					);
+				}
+			}
+			catch (Exception ex)
+			{
+				occuredExceptions.Add(ex);
 			}
 		}
 
@@ -277,7 +306,7 @@ namespace KeePassBrowserImporter
 		/// Gets all stored history items.
 		/// </summary>
 		/// <returns>The history items</returns>
-		private List<string> GetHistoryItems()
+		private static IEnumerable<string> GetHistoryItems()
 		{
 			var urlHistory = new CUrlHistory();
 			var urlHistoryStg = (IUrlHistoryStg)urlHistory;
@@ -325,7 +354,7 @@ namespace KeePassBrowserImporter
 		/// <summary>
 		/// Enumerates the auto complete passwords stored in the registry.
 		/// </summary>
-		private IEnumerable<EntryInfo> ReadRegistryPasswords()
+		private static IEnumerable<EntryInfo> ReadRegistryPasswords()
 		{
 			var hashToUrl = new Dictionary<string, string>();
 			using (var sha1 = new SHA1Managed())
@@ -403,12 +432,12 @@ namespace KeePassBrowserImporter
 		/// <summary>
 		/// Enumerates the HTTP Basic Authentication passwords stored in the credential store.
 		/// </summary>
-		private IEnumerable<EntryInfo> ReadCredentialStorePasswords()
+		private static IEnumerable<EntryInfo> ReadCredentialStorePasswords()
 		{
-			int count;
-			IntPtr credentials = IntPtr.Zero;
+			var credentials = IntPtr.Zero;
 			try
 			{
+				int count;
 				if (CredEnumerate(null, 0, out count, out credentials))
 				{
 					var entropy = new byte[]
@@ -469,7 +498,7 @@ namespace KeePassBrowserImporter
 		/// <summary>
 		/// Enumerates the passwords stored in the password vault.
 		/// </summary>
-		private IEnumerable<EntryInfo> ReadVaultPasswords()
+		private static IEnumerable<EntryInfo> ReadVaultPasswords()
 		{
 			if (!(Environment.OSVersion.Version.Major > 6 || (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor >= 1)))
 			{
@@ -481,26 +510,26 @@ namespace KeePassBrowserImporter
 			const uint ERROR_SUCCESS = 0;
 			const uint VAULT_ENUMERATE_ALL_ITEMS = 512;
 
-			bool isWin8 = Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor > 1;
+			var isWin8 = Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor > 1;
 
-			int vaultCount;
-			IntPtr vaultGuids = IntPtr.Zero;
+			var vaultGuids = IntPtr.Zero;
 			try
 			{
+				int vaultCount;
 				if (VaultEnumerateVaults(0, out vaultCount, out vaultGuids) == ERROR_SUCCESS)
 				{
 					for (var i = 0; i < vaultCount; ++i)
 					{
-						IntPtr vault = IntPtr.Zero;
+						var vault = IntPtr.Zero;
 						try
 						{
 							var vaultIdPtr = vaultGuids + i * Marshal.SizeOf(typeof(Guid));
 							if (VaultOpenVault(vaultIdPtr, 0, out vault) == ERROR_SUCCESS)
 							{
-								int itemCount;
-								IntPtr items = IntPtr.Zero;
+								var items = IntPtr.Zero;
 								try
 								{
+									int itemCount;
 									if (VaultEnumerateItems(vault, VAULT_ENUMERATE_ALL_ITEMS, out itemCount, out items) == ERROR_SUCCESS)
 									{
 										for (var j = 0; j < itemCount; ++j)
@@ -525,7 +554,7 @@ namespace KeePassBrowserImporter
 
 												if (item.dwPropertiesCount > 0)
 												{
-													IntPtr propertyPtr = IntPtr.Zero;
+													var propertyPtr = IntPtr.Zero;
 													if (VaultGetItem8(vault, itemPtr, item.pResourceElement, item.pIdentityElement, IntPtr.Zero, IntPtr.Zero, 0, out propertyPtr) == ERROR_SUCCESS)
 													{
 														var property = (VAULT_ITEM_W8)Marshal.PtrToStructure(propertyPtr, typeof(VAULT_ITEM_W8));
@@ -555,7 +584,7 @@ namespace KeePassBrowserImporter
 
 												if (item.dwPropertiesCount > 0)
 												{
-													IntPtr propertyPtr = IntPtr.Zero;
+													var propertyPtr = IntPtr.Zero;
 													if (VaultGetItem7(vault, itemPtr, item.pResourceElement, item.pIdentityElement, IntPtr.Zero, 0, out propertyPtr) == ERROR_SUCCESS)
 													{
 														var property = (VAULT_ITEM_W7)Marshal.PtrToStructure(propertyPtr, typeof(VAULT_ITEM_W7));
@@ -607,7 +636,6 @@ namespace KeePassBrowserImporter
 					VaultFree(vaultGuids);
 				}
 			}
-			yield break;
 		}
 
 		/// <summary>
@@ -616,10 +644,10 @@ namespace KeePassBrowserImporter
 		/// <param name="data">The binary data</param>
 		/// <param name="offset">The offset</param>
 		/// <returns></returns>
-		private static T FromBinaryData<T>(byte[] data, int offset)
+		private static T FromBinaryData<T>(ICollection<byte> data, int offset)
 		{
 			Contract.Requires(data != null);
-			Contract.Requires(data.Length >= offset + Marshal.SizeOf(typeof(T)));
+			Contract.Requires(data.Count >= offset + Marshal.SizeOf(typeof(T)));
 
 			var handle = GCHandle.Alloc(data, GCHandleType.Pinned);
 			var result = (T)Marshal.PtrToStructure(handle.AddrOfPinnedObject() + offset, typeof(T));
@@ -634,11 +662,11 @@ namespace KeePassBrowserImporter
 		/// <param name="data">The binary data</param>
 		/// <param name="offset">The offset</param>
 		/// <returns></returns>
-		private static string BytePtrToStringUni(byte[] data, int offset)
+		private static string BytePtrToStringUni(ICollection<byte> data, int offset)
 		{
 			Contract.Requires(data != null);
 			Contract.Requires(offset >= 0);
-			Contract.Requires(data.Length >= offset);
+			Contract.Requires(data.Count >= offset);
 
 			var handle = GCHandle.Alloc(data, GCHandleType.Pinned);
 			var result = Marshal.PtrToStringUni(handle.AddrOfPinnedObject() + offset);

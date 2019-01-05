@@ -4,6 +4,7 @@ using System.Data.Common;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
+using KeePassLib.Utility;
 
 namespace KeePassBrowserImporter
 {
@@ -82,7 +83,7 @@ namespace KeePassBrowserImporter
 			}
 			catch (DbException ex)
 			{
-				throw new Exception("Error while using the browsers login database. It may help to close all running instances of the browser.", ex);
+				throw new Exception($"Error while using the browsers login database. It may help to close all running instances of the browser.\n\n{StrUtil.FormatException(ex)}", ex);
 			}
 		}
 	}

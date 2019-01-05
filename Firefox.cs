@@ -124,7 +124,7 @@ namespace KeePassBrowserImporter
 		/// <summary>
 		/// Import the credentials with the Network Security Services methods.
 		/// </summary>
-		/// <exception cref="FileNotFoundException">Thrown when the requested profile is not present.</exception>
+		/// <exception cref="ProfileNotFoundException">Thrown when the requested profile is not present.</exception>
 		/// <exception cref="NetworkSecurityServicesException">Thrown when a Network Security Services error condition occurs.</exception>
 		/// <param name="param">The parameters for the import</param>
 		public override void ImportCredentials(ImportParameter param)
@@ -145,10 +145,10 @@ namespace KeePassBrowserImporter
 			var nss3Handle = LoadLibrary(Path.Combine(nativeLibraryPath, NSS3_DLL));
 			if (nss3Handle == IntPtr.Zero)
 			{
-				throw new Win32Exception();
+				throw new Win32Exception($"Could not load file: {Path.Combine(nativeLibraryPath, NSS3_DLL)}");
 			}
 
-			IntPtr slot = IntPtr.Zero;
+			var slot = IntPtr.Zero;
 			try
 			{
 				if (NSS_Init(currentProfilePath) != SECStatus.Success)
@@ -171,14 +171,15 @@ namespace KeePassBrowserImporter
 					throw new NetworkSecurityServicesException("PK11_Authenticate failed");
 				}
 
-				foreach (var entry in ReadLoginsFile(currentProfilePath).Union(ReadSignonsFile(currentProfilePath)))
+				var exceptions = new List<Exception>();
+				ImportCredentialsImpl(param, () => ReadLoginsFile(currentProfilePath), ref exceptions);
+				ImportCredentialsImpl(param, () => ReadSignonsFile(currentProfilePath), ref exceptions);
+
+				if (exceptions.Any())
 				{
-					param.Database.CreateWebsiteEntry(
-						param.Group,
-						entry,
-						param.CreationSettings,
-						param.Logger
-					);
+					var combinedMessages = string.Join("\n\n", exceptions.Select(StrUtil.FormatException));
+
+					throw new Exception(combinedMessages);
 				}
 			}
 			finally
@@ -198,47 +199,77 @@ namespace KeePassBrowserImporter
 		}
 
 		/// <summary>
+		/// Imports the credentials provided by the <see cref="importFunc"/>.
+		/// </summary>
+		/// <param name="param">The parameters for the import</param>
+		/// <param name="importFunc">The provider for the credential entries.</param>
+		/// <param name="occuredExceptions">List with occured exceptions.</param>
+		private static void ImportCredentialsImpl(ImportParameter param, Func<IEnumerable<EntryInfo>> importFunc, ref List<Exception> occuredExceptions)
+		{
+			try
+			{
+				foreach (var entry in importFunc())
+				{
+					param.Database.CreateWebsiteEntry(
+						param.Group,
+						entry,
+						param.CreationSettings,
+						param.Logger
+					);
+				}
+			}
+			catch (Exception ex)
+			{
+				occuredExceptions.Add(ex);
+			}
+		}
+
+		/// <summary>
 		/// Enumerates the entries of the signons.sqlite file.
 		/// </summary>
 		/// <param name="profilePath">Path of the profile folder</param>
 		/// <returns></returns>
-		private IList<EntryInfo> ReadSignonsFile(string profilePath)
+		private static IEnumerable<EntryInfo> ReadSignonsFile(string profilePath)
 		{
-			try
+			var entries = new List<EntryInfo>();
+
+			var dbPath = Path.Combine(profilePath, "signons.sqlite");
+			if (File.Exists(dbPath))
 			{
-				using (var db = new DBHandler(Path.Combine(profilePath, "signons.sqlite")))
+				try
 				{
-					var entries = new List<EntryInfo>();
-
-					DataTable dt;
-					db.Query(out dt, "SELECT hostname, encryptedUsername, encryptedPassword, timeCreated, timePasswordChanged FROM moz_logins");
-
-					foreach (var row in dt.AsEnumerable())
+					using (var db = new DBHandler(dbPath))
 					{
-						try
+						DataTable dt;
+						db.Query(out dt, "SELECT hostname, encryptedUsername, encryptedPassword, timeCreated, timePasswordChanged FROM moz_logins");
+
+						foreach (var row in dt.AsEnumerable())
 						{
-							entries.Add(new EntryInfo
+							try
 							{
-								Hostname = (row["hostname"] as string).Trim(),
-								Username = PK11_Decrypt(row["encryptedUsername"] as string).Trim(),
-								Password = PK11_Decrypt(row["encryptedPassword"] as string),
-								Created = DateUtils.FromUnixTimeMilliseconds((long)row["timeCreated"]),
-								Modified = DateUtils.FromUnixTimeMilliseconds((long)row["timePasswordChanged"])
-							});
-						}
-						catch
-						{
-							// Skip faulty entries
+								entries.Add(new EntryInfo
+								{
+									Hostname = (row["hostname"] as string).Trim(),
+									Username = PK11_Decrypt(row["encryptedUsername"] as string).Trim(),
+									Password = PK11_Decrypt(row["encryptedPassword"] as string),
+									Created = DateUtils.FromUnixTimeMilliseconds((long)row["timeCreated"]),
+									Modified = DateUtils.FromUnixTimeMilliseconds((long)row["timePasswordChanged"])
+								});
+							}
+							catch
+							{
+								// Skip faulty entries
+							}
 						}
 					}
-
-					return entries;
+				}
+				catch (DbException ex)
+				{
+					throw new Exception($"Error while using the browsers login database. It may help to close all running instances of the browser.\n\n{StrUtil.FormatException(ex)}", ex);
 				}
 			}
-			catch (DbException ex)
-			{
-				throw new Exception("Error while using the browsers login database. It may help to close all running instances of the browser.", ex);
-			}
+
+			return entries;
 		}
 
 		/// <summary>
@@ -246,7 +277,7 @@ namespace KeePassBrowserImporter
 		/// </summary>
 		/// <param name="profilePath">Path of the profile folder</param>
 		/// <returns></returns>
-		private IList<EntryInfo> ReadLoginsFile(string profilePath)
+		private static IEnumerable<EntryInfo> ReadLoginsFile(string profilePath)
 		{
 			var entries = new List<EntryInfo>();
 
