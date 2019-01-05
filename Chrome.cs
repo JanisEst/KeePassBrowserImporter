@@ -22,7 +22,7 @@ namespace KeePassBrowserImporter
 			{
 				foreach (var dir in profileDir.EnumerateDirectories())
 				{
-					if (dir.EnumerateFiles().Where(f => f.Name == "Login Data").Any())
+					if (dir.EnumerateFiles().Any(f => f.Name == "Login Data"))
 					{
 						yield return dir.Name;
 					}
