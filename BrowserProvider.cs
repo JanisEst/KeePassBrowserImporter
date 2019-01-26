@@ -64,7 +64,15 @@ namespace KeePassBrowserImporter
 
 				if (task.IsFaulted)
 				{
-					throw new Exception($"Error while importing credentials from browser. Some credentials may have been imported.\n\n{task.Exception?.Message}", task.Exception == null ? null : task.Exception.InnerException);
+					var message = "Error while importing credentials from browser. Some credentials may have been imported.";
+					Exception innerException = null;
+					if (task.Exception != null)
+					{
+						message += "\n\n" + task.Exception.Message;
+						innerException = task.Exception.InnerException;
+					}
+
+					throw new Exception(message, innerException);
 				}
 			}
 		}

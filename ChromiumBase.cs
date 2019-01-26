@@ -83,7 +83,7 @@ namespace KeePassBrowserImporter
 			}
 			catch (DbException ex)
 			{
-				throw new Exception($"Error while using the browsers login database. It may help to close all running instances of the browser.\n\n{StrUtil.FormatException(ex)}", ex);
+				throw new Exception(string.Format("Error while using the browsers login database. It may help to close all running instances of the browser.\n\n{0}", StrUtil.FormatException(ex)), ex);
 			}
 		}
 	}

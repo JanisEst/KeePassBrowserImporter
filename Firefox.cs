@@ -145,7 +145,7 @@ namespace KeePassBrowserImporter
 			var nss3Handle = LoadLibrary(Path.Combine(nativeLibraryPath, NSS3_DLL));
 			if (nss3Handle == IntPtr.Zero)
 			{
-				throw new Win32Exception($"Could not load file: {Path.Combine(nativeLibraryPath, NSS3_DLL)}");
+				throw new Win32Exception(string.Format("Could not load file: {0}", Path.Combine(nativeLibraryPath, NSS3_DLL)));
 			}
 
 			var slot = IntPtr.Zero;
@@ -265,7 +265,7 @@ namespace KeePassBrowserImporter
 				}
 				catch (DbException ex)
 				{
-					throw new Exception($"Error while using the browsers login database. It may help to close all running instances of the browser.\n\n{StrUtil.FormatException(ex)}", ex);
+					throw new Exception(string.Format("Error while using the browsers login database. It may help to close all running instances of the browser.\n\n{0}", StrUtil.FormatException(ex)), ex);
 				}
 			}
 
