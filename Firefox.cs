@@ -286,18 +286,18 @@ namespace KeePassBrowserImporter
 			{
 				var root = new JsonObject(new CharStream(File.ReadAllText(path)));
 
-				var logins = root.Items["logins"].Value as JsonArray;
-				foreach (var item in logins.Values.Select(v => v.Value).Cast<JsonObject>())
+				var logins = root.GetValueArray<JsonObject>("logins");
+				foreach (var item in logins)
 				{
 					try
 					{
 						entries.Add(new EntryInfo
 						{
-							Hostname = (item.Items["hostname"].Value as string).Trim(),
-							Username = PK11_Decrypt(item.Items["encryptedUsername"].Value as string).Trim(),
-							Password = PK11_Decrypt(item.Items["encryptedPassword"].Value as string),
-							Created = DateUtils.FromUnixTimeMilliseconds((long)(item.Items["timeCreated"].Value as JsonNumber).Value),
-							Modified = DateUtils.FromUnixTimeMilliseconds((long)(item.Items["timePasswordChanged"].Value as JsonNumber).Value)
+							Hostname = item.GetValue<string>("hostname").Trim(),
+							Username = PK11_Decrypt(item.GetValue<string>("encryptedUsername").Trim()),
+							Password = PK11_Decrypt(item.GetValue<string>("encryptedPassword")),
+							Created = DateUtils.FromUnixTimeMilliseconds(item.GetValue("timeCreated", 0L)),
+							Modified = DateUtils.FromUnixTimeMilliseconds(item.GetValue("timePasswordChanged", 0L))
 						});
 					}
 					catch
